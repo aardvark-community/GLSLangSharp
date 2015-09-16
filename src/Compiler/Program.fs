@@ -3,7 +3,7 @@
 
 open Aardvark.Base
 open GLSLang
-
+open GLSLang.SpirV
 let code = """#version 140
 #extension GL_ARB_separate_shader_objects : enable
 #extension GL_ARB_shading_language_420pack : enable
@@ -33,26 +33,22 @@ let main argv =
 
 
     match GLSLang.tryCompileSpirVBinary ShaderStage.Vertex code with
-        | Success spirv ->
-            use mem = new System.IO.MemoryStream(spirv)
-            let instructions = GLSLang.SpirV.SpirVReader.readStream mem
+        | Success theirs ->
+            let instructions = SpirV.disassemble theirs
 
             for i in instructions do
-                printfn "%A" i
+                match SpirV.tryGetResultId i with
+                    | Some id -> printfn "%d:\t%A" id i
+                    | None -> printfn "   \t%A" i
 
-            use memOut = new System.IO.MemoryStream()
-            GLSLang.SpirV.SpirVWriter.writeStream memOut instructions
-            memOut.Flush()
+            let mine = SpirV.assemble instructions
 
-    
-            let theirs = spirv
-            let mine = memOut.ToArray()
-
+ 
             let equalLength = theirs.Length = mine.Length
             let equal = equalLength && Array.forall2 (=) theirs mine
             printfn "length: %A equal: %A" equalLength equal
 
-            System.IO.File.WriteAllBytes(@"C:\Users\schorsch\Desktop\test.spv", spirv)
+            System.IO.File.WriteAllBytes(@"C:\Users\schorsch\Desktop\test.spv", theirs)
         | Error e ->
             printfn "%s" e
 

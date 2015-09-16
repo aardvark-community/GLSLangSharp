@@ -460,6 +460,7 @@
     <Compile Include="Wrapper.fs" />
     <Compile Include="GLSLang.fs" />
     <Compile Include="SpirVCore.fs" />
+    <Compile Include="SpirVInstructions.fs" />
     <Compile Include="SpirV.fs" />
   </ItemGroup>
   <ItemGroup>

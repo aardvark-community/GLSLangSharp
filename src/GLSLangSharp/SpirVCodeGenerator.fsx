@@ -371,7 +371,7 @@ let readerString (a : Argument) (offset : byref<int>) =
                 failwithf "cannot read: %A" t
 
 let operationHeader() =
-    printfn "module SpirVUtilities = "
+    printfn "module private SpirVUtilities = "
 
 let readers() =
     printfn "    let private ofRawInstruction (i : RawInstruction) = "

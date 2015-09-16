@@ -666,11 +666,6 @@ module private RawReader =
         let bound = data.ReadUInt32()
         let reserved = data.ReadUInt32()
 
-        printfn "magic: 0x%X" magic
-        printfn "version: %d" version
-        printfn "generator: %d" generator
-        printfn "bound: %d" bound
-        printfn "reserved: %d" reserved
 
         if magic <> SV_MAGIC || version <> 99u then
             failwith "[SpirV] invalid SpirV magic or version"

@@ -237,7 +237,7 @@ type Instruction =
     | MemoryBarrier of mem : Scope * sem : MemorySemantics
 
 
-module SpirVUtilities = 
+module private SpirVUtilities = 
     let private ofRawInstruction (i : RawInstruction) = 
         let args = i.operands
         match i.opCode with
