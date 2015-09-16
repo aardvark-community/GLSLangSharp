@@ -162,5 +162,25 @@ module GLSLang =
             | (true, _) -> Success prog
             | (false, log) -> Error log
 
-    let tryGetSpirVForStage (program : Program) (stage : ShaderStage) =
+    let tryGetSpirVBinaryForStage (program : Program) (stage : ShaderStage) =
         program.TryGetSpirVForStage stage
+
+
+    let tryCompileSpirVBinary (stage : ShaderStage) (glslCode : string) =
+        match tryCreateShader stage glslCode with
+            | Error e -> Error e
+            | Success shader -> 
+                match tryCreateProgram [shader] with
+                    | Error e -> 
+                        shader.Dispose()
+                        Error e
+                    | Success program ->
+                        let result = 
+                            match tryGetSpirVBinaryForStage program stage with
+                                | Some spirv ->
+                                    Success spirv
+                                | None ->
+                                    Error "could not get SpirV code"
+                        program.Dispose()
+                        shader.Dispose()
+                        result

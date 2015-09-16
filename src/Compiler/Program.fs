@@ -29,20 +29,11 @@ void main()
 [<EntryPoint>]
 let main argv = 
 
-    let shader =
-        match GLSLang.tryCreateShader ShaderStage.Vertex code with
-            | Success shader -> shader
-            | Error e -> failwith e
 
-    let program =
-        match GLSLang.tryCreateProgram [shader] with
-            | Success p -> p
-            | Error e -> failwith e
-
-    match GLSLang.tryGetSpirVForStage program ShaderStage.Vertex with
-        | Some spirv ->
+    match GLSLang.tryCompileSpirVBinary ShaderStage.Vertex code with
+        | Success spirv ->
             System.IO.File.WriteAllBytes(@"C:\Users\schorsch\Desktop\test.spv", spirv)
-        | None ->
-            printfn "could not get SpirV code"
+        | Error e ->
+            printfn "%s" e
 
     0 // return an integer exit code
