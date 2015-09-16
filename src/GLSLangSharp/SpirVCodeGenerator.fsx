@@ -108,12 +108,58 @@ let prototypes =
         { opCode = OpCode.FunctionCall; args = [ResultType; ResultId; Arg("f", typeof<int>); Arg("args", typeof<int[]>)] }
 
         // Images
-
+        { opCode = OpCode.SampledImage; args = [ResultType; ResultId; Arg("image", typeof<int>); Arg("sampler", typeof<int>)] }
+        { opCode = OpCode.ImageSampleImplicitLod; args = [ResultType; ResultId; Arg("image", typeof<int>); Arg("coordinate", typeof<int>); Arg("operands", typeof<int[]>)] }
+        { opCode = OpCode.ImageSampleExplicitLod; args = [ResultType; ResultId; Arg("image", typeof<int>); Arg("coordinate", typeof<int>); Arg("operands", typeof<int[]>)] }
+        { opCode = OpCode.ImageSampleDrefImplicitLod; args = [ResultType; ResultId; Arg("image", typeof<int>); Arg("coordinate", typeof<int>); Arg("dref", typeof<int>); Arg("operands", typeof<int[]>)] }
+        { opCode = OpCode.ImageSampleDrefExplicitLod; args = [ResultType; ResultId; Arg("image", typeof<int>); Arg("coordinate", typeof<int>); Arg("dref", typeof<int>); Arg("operands", typeof<int[]>)] }
+        { opCode = OpCode.ImageSampleProjImplicitLod; args = [ResultType; ResultId; Arg("image", typeof<int>); Arg("coordinate", typeof<int>); Arg("operands", typeof<int[]>)] }
+        { opCode = OpCode.ImageSampleProjExplicitLod; args = [ResultType; ResultId; Arg("image", typeof<int>); Arg("coordinate", typeof<int>); Arg("operands", typeof<int[]>)] }
+        { opCode = OpCode.ImageSampleProjDrefImplicitLod; args = [ResultType; ResultId; Arg("image", typeof<int>); Arg("coordinate", typeof<int>); Arg("dref", typeof<int>); Arg("operands", typeof<int[]>)] }
+        { opCode = OpCode.ImageSampleProjDrefExplicitLod; args = [ResultType; ResultId; Arg("image", typeof<int>); Arg("coordinate", typeof<int>); Arg("dref", typeof<int>); Arg("operands", typeof<int[]>)] }
+        { opCode = OpCode.ImageFetch; args = [ResultType; ResultId; Arg("image", typeof<int>); Arg("coordinate", typeof<int>); Arg("operands", typeof<int[]>)] }
+        { opCode = OpCode.ImageGather; args = [ResultType; ResultId; Arg("image", typeof<int>); Arg("coordinate", typeof<int>); Arg("comp", typeof<int>); Arg("operands", typeof<int[]>)] }
+        { opCode = OpCode.ImageDrefGather; args = [ResultType; ResultId; Arg("image", typeof<int>); Arg("coordinate", typeof<int>); Arg("dref", typeof<int>); Arg("operands", typeof<int[]>)] }
+        { opCode = OpCode.ImageRead; args = [ResultType; ResultId; Arg("image", typeof<int>); Arg("coordinate", typeof<int>) ] }
+        { opCode = OpCode.ImageWrite; args = [Arg("image", typeof<int>); Arg("coordinate", typeof<int>); Arg("texel", typeof<int>) ] }
+        { opCode = OpCode.ImageQueryDim; args = [ResultType; ResultId; Arg("image", typeof<int>) ] }
+        { opCode = OpCode.ImageQueryFormat; args = [ResultType; ResultId; Arg("image", typeof<int>) ] }
+        { opCode = OpCode.ImageQueryOrder; args = [ResultType; ResultId; Arg("image", typeof<int>) ] }
+        { opCode = OpCode.ImageQuerySizeLod; args = [ResultType; ResultId; Arg("image", typeof<int>); Arg("level", typeof<int>) ] }
+        { opCode = OpCode.ImageQuerySize; args = [ResultType; ResultId; Arg("image", typeof<int>) ] }
+        { opCode = OpCode.ImageQueryLod; args = [ResultType; ResultId; Arg("image", typeof<int>); Arg("coordinate", typeof<int>) ] }
+        { opCode = OpCode.ImageQueryLevels; args = [ResultType; ResultId; Arg("image", typeof<int>) ] }
+        { opCode = OpCode.ImageQuerySamples; args = [ResultType; ResultId; Arg("image", typeof<int>) ] }
 
         // Conversion
+        { opCode = OpCode.ConvertFToU; args = [ResultType; ResultId; Arg("value", typeof<int>) ] }
+        { opCode = OpCode.ConvertFToS; args = [ResultType; ResultId; Arg("value", typeof<int>) ] }
+        { opCode = OpCode.ConvertSToF; args = [ResultType; ResultId; Arg("value", typeof<int>) ] }
+        { opCode = OpCode.ConvertUToF; args = [ResultType; ResultId; Arg("value", typeof<int>) ] }
+        { opCode = OpCode.UConvert; args = [ResultType; ResultId; Arg("value", typeof<int>) ] }
+        { opCode = OpCode.SConvert; args = [ResultType; ResultId; Arg("value", typeof<int>) ] }
+        { opCode = OpCode.FConvert; args = [ResultType; ResultId; Arg("value", typeof<int>) ] }
+        { opCode = OpCode.QuantizeToF16; args = [ResultType; ResultId; Arg("value", typeof<int>) ] }
+        { opCode = OpCode.ConvertPtrToU; args = [ResultType; ResultId; Arg("value", typeof<int>) ] }
+        { opCode = OpCode.SatConvertSToU; args = [ResultType; ResultId; Arg("value", typeof<int>) ] }
+        { opCode = OpCode.SatConvertUToS; args = [ResultType; ResultId; Arg("value", typeof<int>) ] }
+        { opCode = OpCode.ConvertUToPtr; args = [ResultType; ResultId; Arg("value", typeof<int>) ] }
+        { opCode = OpCode.PtrCastToGeneric; args = [ResultType; ResultId; Arg("value", typeof<int>) ] }
+        { opCode = OpCode.GenericCastToPtr; args = [ResultType; ResultId; Arg("value", typeof<int>) ] }
+        { opCode = OpCode.GenericCastToPtrExplicit; args = [ResultType; ResultId; Arg("value", typeof<int>); Arg("_class", typeof<StorageClass>) ] }
+        { opCode = OpCode.Bitcast; args = [ResultType; ResultId; Arg("operand", typeof<int>) ] }
 
+        // Composite instructions
+        { opCode = OpCode.VectorExtractDynamic; args = [ResultType; ResultId; Arg("vector", typeof<int>); Arg("index", typeof<int>) ] }
+        { opCode = OpCode.VectorInsertDynamic; args = [ResultType; ResultId; Arg("vector", typeof<int>); Arg("comp", typeof<int>); Arg("index", typeof<int>) ] }
+        { opCode = OpCode.VectorShuffle; args = [ResultType; ResultId; Arg("vec1", typeof<int>); Arg("vec2", typeof<int>); Arg("components", typeof<int[]>) ] }
+        { opCode = OpCode.CompositeConstruct; args = [ResultType; ResultId; Arg("components", typeof<int[]>) ] }
+        { opCode = OpCode.CompositeExtract; args = [ResultType; ResultId; Arg("composite", typeof<int>); Arg("components", typeof<int[]>) ] }
+        { opCode = OpCode.CompositeInsert; args = [ResultType; ResultId; Arg("value", typeof<int>); Arg("composite", typeof<int>); Arg("components", typeof<int[]>) ] }
+        { opCode = OpCode.CopyObject; args = [ResultType; ResultId; Arg("operand", typeof<int>) ] }
+        { opCode = OpCode.Transpose; args = [ResultType; ResultId; Arg("matrix", typeof<int>) ] }
 
-        // Arithmetic
+        // Arithmetic instructions
 
 
         // Bit instructions
@@ -162,7 +208,7 @@ let rec typeName (t : Type) =
     elif t.IsArray then sprintf "%s[]" (typeName (t.GetElementType()))
     else t.Name
 
-let printInstructionType() =
+let definition() =
     printfn "type Instruction = "
     for p in prototypes do
         if List.isEmpty p.args then
@@ -264,7 +310,7 @@ let writers() =
 
 let generate() =
     header()
-    printInstructionType()
+    definition()
     readers()
     writers()
 
