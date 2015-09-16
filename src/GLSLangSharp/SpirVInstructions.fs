@@ -237,7 +237,7 @@ type Instruction =
     | MemoryBarrier of mem : Scope * sem : MemorySemantics
 
 
-module SpirVReader = 
+module SpirVUtilities = 
     let private ofRawInstruction (i : RawInstruction) = 
         let args = i.operands
         match i.opCode with
@@ -480,7 +480,6 @@ module SpirVReader =
         m.instructions |> List.map ofRawInstruction
 
 
-module SpirVReflector = 
     let tryGetId (i : Instruction) = 
         match i with
             | Undef(_, resId) -> Some resId
@@ -680,7 +679,6 @@ module SpirVReflector =
             | AtomicXor(_, resId, _, _, _, _) -> Some resId
             | _ -> None
 
-
     let tryGetResultTypeId (i : Instruction) = 
         match i with
             | Undef(resType, _) -> Some resType
@@ -856,8 +854,6 @@ module SpirVReflector =
             | AtomicXor(resType, _, _, _, _, _) -> Some resType
             | _ -> None
 
-
-module SpirVWriter = 
     let private toRawInstruction (i : Instruction) = 
         match i with
             | Nop -> { opCode = OpCode.Nop; operands = RawOperands() }
@@ -1095,7 +1091,7 @@ module SpirVWriter =
 
     let writeStream (o : Stream) (instructions : list<Instruction>) = 
         let raw = instructions |> List.map toRawInstruction
-        let maxId = instructions |> List.choose SpirVReflector.tryGetId |> List.max
+        let maxId = instructions |> List.choose tryGetId |> List.max
         RawWriter.write o raw maxId
 
 

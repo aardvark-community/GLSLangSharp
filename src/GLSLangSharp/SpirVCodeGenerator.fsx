@@ -370,8 +370,10 @@ let readerString (a : Argument) (offset : byref<int>) =
             else
                 failwithf "cannot read: %A" t
 
+let operationHeader() =
+    printfn "module SpirVUtilities = "
+
 let readers() =
-    printfn "module SpirVReader = "
     printfn "    let private ofRawInstruction (i : RawInstruction) = "
     printfn "        let args = i.operands"
     printfn "        match i.opCode with"
@@ -398,7 +400,6 @@ let readers() =
     printfn ""
 
 let writers() =
-    printfn "module SpirVWriter = "
     printfn "    let private toRawInstruction (i : Instruction) = "
     printfn "        match i with"
     for p in prototypes do
@@ -420,13 +421,12 @@ let writers() =
     printfn ""
     printfn "    let writeStream (o : Stream) (instructions : list<Instruction>) = "
     printfn "        let raw = instructions |> List.map toRawInstruction"
-    printfn "        let maxId = instructions |> List.choose SpirVReflector.tryGetId |> List.max"
+    printfn "        let maxId = instructions |> List.choose tryGetId |> List.max"
     printfn "        RawWriter.write o raw maxId"
     printfn ""
     printfn ""
 
 let reflector() =
-    printfn "module SpirVReflector = "
     printfn "    let tryGetId (i : Instruction) = "
     printfn "        match i with"
     for p in prototypes do
@@ -480,9 +480,11 @@ let reflector() =
 let generate() =
     header()
     definition()
+
+    operationHeader()
     readers()
     reflector()
     writers()
 
     let content = sb.ToString()
-    File.WriteAllText("SpirV.fs", content)
+    File.WriteAllText("SpirVInstructions.fs", content)
