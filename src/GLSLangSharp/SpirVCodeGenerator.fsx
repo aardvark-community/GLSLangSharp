@@ -425,7 +425,7 @@ let writers() =
     printfn ""
     printfn ""
 
-let idExtractors() =
+let reflector() =
     printfn "module SpirVReflector = "
     printfn "    let tryGetId (i : Instruction) = "
     printfn "        match i with"
@@ -448,16 +448,40 @@ let idExtractors() =
                 printfn "            | %A(%s) -> Some resId" p.opCode args
 
     printfn "            | _ -> None"
-
     printfn ""
-    printfn "" 
+
+
+    printfn "    let tryGetResultTypeId (i : Instruction) = "
+    printfn "        match i with"
+    for p in prototypes do
+        if not (List.isEmpty p.args) then
+            let found = ref false
+            let args = 
+                p.args 
+                    |> List.map (fun a ->
+                        match a with
+                            | ResultId -> "_"
+                            | ResultType -> 
+                                found := true
+                                "resType"
+                            | Arg(name, _) -> "_"
+                       )
+                    |> String.concat ", "
+
+            if !found then
+                printfn "            | %A(%s) -> Some resType" p.opCode args
+
+    printfn "            | _ -> None"
+    printfn ""
+    
+
 
 
 let generate() =
     header()
     definition()
     readers()
-    idExtractors()
+    reflector()
     writers()
 
     let content = sb.ToString()
