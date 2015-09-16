@@ -1,5 +1,5 @@
 NUGET
-  remote: \\hobel.ra1.vrvis.lan\nuget
+  remote: https://vrvis.myget.org/F/aardvark/api/v2
   specs:
     Aardvark.Base (1.3.28)
       DevILSharp (>= 0.0.9 < 0.1.0)
@@ -16,7 +16,7 @@ NUGET
       Aardvark.Base (1.3.28)
       Aardvark.Base.Essentials (1.3.28)
       Aardvark.Base.FSharp (1.3.28)
-    Aardvark.Base.Rendering (1.3.22)
+    Aardvark.Base.Rendering (1.3.24)
       Aardvark.Base.Incremental (>= 1.3.5 < 1.4.0)
     FSharp.Compiler.Service (0.0.90)
     RegexProvider (0.0.5)
