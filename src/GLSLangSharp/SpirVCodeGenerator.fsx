@@ -420,14 +420,44 @@ let writers() =
     printfn ""
     printfn "    let writeStream (o : Stream) (instructions : list<Instruction>) = "
     printfn "        let raw = instructions |> List.map toRawInstruction"
-    printfn "        RawWriter.write o raw"
+    printfn "        let maxId = instructions |> List.choose SpirVReflector.tryGetId |> List.max"
+    printfn "        RawWriter.write o raw maxId"
     printfn ""
     printfn ""
+
+let idExtractors() =
+    printfn "module SpirVReflector = "
+    printfn "    let tryGetId (i : Instruction) = "
+    printfn "        match i with"
+    for p in prototypes do
+        if not (List.isEmpty p.args) then
+            let found = ref false
+            let args = 
+                p.args 
+                    |> List.map (fun a ->
+                        match a with
+                            | ResultType -> "_"
+                            | ResultId -> 
+                                found := true
+                                "resId"
+                            | Arg(name, _) -> "_"
+                       )
+                    |> String.concat ", "
+
+            if !found then
+                printfn "            | %A(%s) -> Some resId" p.opCode args
+
+    printfn "            | _ -> None"
+
+    printfn ""
+    printfn "" 
+
 
 let generate() =
     header()
     definition()
     readers()
+    idExtractors()
     writers()
 
     let content = sb.ToString()

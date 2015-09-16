@@ -480,6 +480,207 @@ module SpirVReader =
         m.instructions |> List.map ofRawInstruction
 
 
+module SpirVReflector = 
+    let tryGetId (i : Instruction) = 
+        match i with
+            | Undef(_, resId) -> Some resId
+            | String(resId, _) -> Some resId
+            | DecorationGroup(resId) -> Some resId
+            | ExtInstImport(resId, _) -> Some resId
+            | ExtInst(_, resId, _, _, _) -> Some resId
+            | TypeVoid(resId) -> Some resId
+            | TypeBool(resId) -> Some resId
+            | TypeInt(resId, _, _) -> Some resId
+            | TypeFloat(resId, _) -> Some resId
+            | TypeVector(resId, _, _) -> Some resId
+            | TypeMatrix(resId, _, _) -> Some resId
+            | TypeImage(resId, _, _, _, _, _, _, _, _) -> Some resId
+            | TypeSampler(resId) -> Some resId
+            | TypeSampledImage(resId, _) -> Some resId
+            | TypeArray(resId, _, _) -> Some resId
+            | TypeRuntimeArray(resId, _) -> Some resId
+            | TypeStruct(resId, _) -> Some resId
+            | TypeOpaque(resId, _) -> Some resId
+            | TypePointer(resId, _, _) -> Some resId
+            | TypeFunction(resId, _, _) -> Some resId
+            | TypeEvent(resId) -> Some resId
+            | TypeDeviceEvent(resId) -> Some resId
+            | TypeReserveId(resId) -> Some resId
+            | TypeQueue(resId) -> Some resId
+            | TypePipe(resId, _, _) -> Some resId
+            | ConstantTrue(_, resId) -> Some resId
+            | ConstantFalse(_, resId) -> Some resId
+            | Constant(_, resId, _) -> Some resId
+            | ConstantComposite(_, resId, _) -> Some resId
+            | ConstantSampler(_, resId, _, _, _) -> Some resId
+            | ConstantNull(_, resId) -> Some resId
+            | SpecConstantTrue(_, resId) -> Some resId
+            | SpecConstantFalse(_, resId) -> Some resId
+            | SpecConstant(_, resId, _) -> Some resId
+            | SpecConstantComposite(_, resId, _) -> Some resId
+            | SpecConstantOp(_, resId, _, _) -> Some resId
+            | Variable(_, resId, _, _) -> Some resId
+            | ImageTexelPointer(_, resId, _, _, _) -> Some resId
+            | Load(_, resId, _, _) -> Some resId
+            | AccessChain(_, resId, _, _) -> Some resId
+            | InBoundsAccessChain(_, resId, _, _) -> Some resId
+            | PtrAccessChain(_, resId, _, _, _) -> Some resId
+            | ArrayLength(_, resId, _, _) -> Some resId
+            | GenericPtrMemSemantics(_, resId, _) -> Some resId
+            | Function(_, resId, _, _) -> Some resId
+            | FunctionParameter(_, resId) -> Some resId
+            | FunctionCall(_, resId, _, _) -> Some resId
+            | SampledImage(_, resId, _, _) -> Some resId
+            | ImageSampleImplicitLod(_, resId, _, _, _) -> Some resId
+            | ImageSampleExplicitLod(_, resId, _, _, _) -> Some resId
+            | ImageSampleDrefImplicitLod(_, resId, _, _, _, _) -> Some resId
+            | ImageSampleDrefExplicitLod(_, resId, _, _, _, _) -> Some resId
+            | ImageSampleProjImplicitLod(_, resId, _, _, _) -> Some resId
+            | ImageSampleProjExplicitLod(_, resId, _, _, _) -> Some resId
+            | ImageSampleProjDrefImplicitLod(_, resId, _, _, _, _) -> Some resId
+            | ImageSampleProjDrefExplicitLod(_, resId, _, _, _, _) -> Some resId
+            | ImageFetch(_, resId, _, _, _) -> Some resId
+            | ImageGather(_, resId, _, _, _, _) -> Some resId
+            | ImageDrefGather(_, resId, _, _, _, _) -> Some resId
+            | ImageRead(_, resId, _, _) -> Some resId
+            | ImageQueryDim(_, resId, _) -> Some resId
+            | ImageQueryFormat(_, resId, _) -> Some resId
+            | ImageQueryOrder(_, resId, _) -> Some resId
+            | ImageQuerySizeLod(_, resId, _, _) -> Some resId
+            | ImageQuerySize(_, resId, _) -> Some resId
+            | ImageQueryLod(_, resId, _, _) -> Some resId
+            | ImageQueryLevels(_, resId, _) -> Some resId
+            | ImageQuerySamples(_, resId, _) -> Some resId
+            | ConvertFToU(_, resId, _) -> Some resId
+            | ConvertFToS(_, resId, _) -> Some resId
+            | ConvertSToF(_, resId, _) -> Some resId
+            | ConvertUToF(_, resId, _) -> Some resId
+            | UConvert(_, resId, _) -> Some resId
+            | SConvert(_, resId, _) -> Some resId
+            | FConvert(_, resId, _) -> Some resId
+            | QuantizeToF16(_, resId, _) -> Some resId
+            | ConvertPtrToU(_, resId, _) -> Some resId
+            | SatConvertSToU(_, resId, _) -> Some resId
+            | SatConvertUToS(_, resId, _) -> Some resId
+            | ConvertUToPtr(_, resId, _) -> Some resId
+            | PtrCastToGeneric(_, resId, _) -> Some resId
+            | GenericCastToPtr(_, resId, _) -> Some resId
+            | GenericCastToPtrExplicit(_, resId, _, _) -> Some resId
+            | Bitcast(_, resId, _) -> Some resId
+            | VectorExtractDynamic(_, resId, _, _) -> Some resId
+            | VectorInsertDynamic(_, resId, _, _, _) -> Some resId
+            | VectorShuffle(_, resId, _, _, _) -> Some resId
+            | CompositeConstruct(_, resId, _) -> Some resId
+            | CompositeExtract(_, resId, _, _) -> Some resId
+            | CompositeInsert(_, resId, _, _, _) -> Some resId
+            | CopyObject(_, resId, _) -> Some resId
+            | Transpose(_, resId, _) -> Some resId
+            | SNegate(_, resId, _) -> Some resId
+            | FNegate(_, resId, _) -> Some resId
+            | IAdd(_, resId, _, _) -> Some resId
+            | FAdd(_, resId, _, _) -> Some resId
+            | ISub(_, resId, _, _) -> Some resId
+            | FSub(_, resId, _, _) -> Some resId
+            | IMul(_, resId, _, _) -> Some resId
+            | FMul(_, resId, _, _) -> Some resId
+            | UDiv(_, resId, _, _) -> Some resId
+            | SDiv(_, resId, _, _) -> Some resId
+            | FDiv(_, resId, _, _) -> Some resId
+            | UMod(_, resId, _, _) -> Some resId
+            | SRem(_, resId, _, _) -> Some resId
+            | SMod(_, resId, _, _) -> Some resId
+            | FRem(_, resId, _, _) -> Some resId
+            | FMod(_, resId, _, _) -> Some resId
+            | VectorTimesScalar(_, resId, _, _) -> Some resId
+            | MatrixTimesScalar(_, resId, _, _) -> Some resId
+            | VectorTimesMatrix(_, resId, _, _) -> Some resId
+            | MatrixTimesVector(_, resId, _, _) -> Some resId
+            | MatrixTimesMatrix(_, resId, _, _) -> Some resId
+            | OuterProduct(_, resId, _, _) -> Some resId
+            | Dot(_, resId, _, _) -> Some resId
+            | IAddCarry(_, resId) -> Some resId
+            | ISubBorrow(_, resId) -> Some resId
+            | IMulExtended(_, resId) -> Some resId
+            | ShiftRightLogical(_, resId, _, _) -> Some resId
+            | ShiftRightArithmetic(_, resId, _, _) -> Some resId
+            | ShiftLeftLogical(_, resId, _, _) -> Some resId
+            | BitwiseOr(_, resId, _, _) -> Some resId
+            | BitwiseXor(_, resId, _, _) -> Some resId
+            | BitwiseAnd(_, resId, _, _) -> Some resId
+            | Not(_, resId, _) -> Some resId
+            | BitFieldInsert(_, resId, _, _, _, _) -> Some resId
+            | BitFieldSExtract(_, resId, _, _, _) -> Some resId
+            | BitFieldUExtract(_, resId, _, _, _) -> Some resId
+            | BitReverse(_, resId, _) -> Some resId
+            | BitCount(_, resId, _) -> Some resId
+            | Any(_, resId, _) -> Some resId
+            | All(_, resId, _) -> Some resId
+            | IsNan(_, resId, _) -> Some resId
+            | IsInf(_, resId, _) -> Some resId
+            | IsFinite(_, resId, _) -> Some resId
+            | IsNormal(_, resId, _) -> Some resId
+            | SignBitSet(_, resId, _) -> Some resId
+            | LessOrGreater(_, resId, _, _) -> Some resId
+            | Ordered(_, resId, _, _) -> Some resId
+            | Unordered(_, resId, _, _) -> Some resId
+            | LogicalEqual(_, resId, _, _) -> Some resId
+            | LogicalNotEqual(_, resId, _, _) -> Some resId
+            | LogicalOr(_, resId, _, _) -> Some resId
+            | LogicalAnd(_, resId, _, _) -> Some resId
+            | LogicalNot(_, resId, _) -> Some resId
+            | Select(_, resId, _, _, _) -> Some resId
+            | IEqual(_, resId, _, _) -> Some resId
+            | INotEqual(_, resId, _, _) -> Some resId
+            | UGreaterThan(_, resId, _, _) -> Some resId
+            | SGreaterThan(_, resId, _, _) -> Some resId
+            | UGreaterThanEqual(_, resId, _, _) -> Some resId
+            | SGreaterThanEqual(_, resId, _, _) -> Some resId
+            | ULessThan(_, resId, _, _) -> Some resId
+            | SLessThan(_, resId, _, _) -> Some resId
+            | ULessThanEqual(_, resId, _, _) -> Some resId
+            | SLessThanEqual(_, resId, _, _) -> Some resId
+            | FOrdEqual(_, resId, _, _) -> Some resId
+            | FUnordEqual(_, resId, _, _) -> Some resId
+            | FOrdNotEqual(_, resId, _, _) -> Some resId
+            | FUnordNotEqual(_, resId, _, _) -> Some resId
+            | FOrdLessThan(_, resId, _, _) -> Some resId
+            | FUnordLessThan(_, resId, _, _) -> Some resId
+            | FOrdGreaterThan(_, resId, _, _) -> Some resId
+            | FUnordGreaterThan(_, resId, _, _) -> Some resId
+            | FOrdLessThanEqual(_, resId, _, _) -> Some resId
+            | FUnordLessThanEqual(_, resId, _, _) -> Some resId
+            | FOrdGreaterThanEqual(_, resId, _, _) -> Some resId
+            | FUnordGreaterThanEqual(_, resId, _, _) -> Some resId
+            | DPdx(_, resId, _) -> Some resId
+            | DPdy(_, resId, _) -> Some resId
+            | Fwidth(_, resId, _) -> Some resId
+            | DPdxFine(_, resId, _) -> Some resId
+            | DPdyFine(_, resId, _) -> Some resId
+            | FwidthFine(_, resId, _) -> Some resId
+            | DPdxCoarse(_, resId, _) -> Some resId
+            | DPdyCoarse(_, resId, _) -> Some resId
+            | FwidthCoarse(_, resId, _) -> Some resId
+            | Phi(_, resId, _) -> Some resId
+            | Label(resId) -> Some resId
+            | AtomicLoad(_, resId, _, _, _) -> Some resId
+            | AtomicStore(_, resId, _, _, _) -> Some resId
+            | AtomicExchange(_, resId, _, _, _, _) -> Some resId
+            | AtomicCompareExchange(_, resId, _, _, _, _, _, _) -> Some resId
+            | AtomicCompareExchangeWeak(_, resId, _, _, _, _, _, _) -> Some resId
+            | AtomicIIncrement(_, resId, _, _, _) -> Some resId
+            | AtomicIDecrement(_, resId, _, _, _) -> Some resId
+            | AtomicIAdd(_, resId, _, _, _, _) -> Some resId
+            | AtomicISub(_, resId, _, _, _, _) -> Some resId
+            | AtomicSMin(_, resId, _, _, _, _) -> Some resId
+            | AtomicUMin(_, resId, _, _, _, _) -> Some resId
+            | AtomicSMax(_, resId, _, _, _, _) -> Some resId
+            | AtomicUMax(_, resId, _, _, _, _) -> Some resId
+            | AtomicAnd(_, resId, _, _, _, _) -> Some resId
+            | AtomicOr(_, resId, _, _, _, _) -> Some resId
+            | AtomicXor(_, resId, _, _, _, _) -> Some resId
+            | _ -> None
+
+
 module SpirVWriter = 
     let private toRawInstruction (i : Instruction) = 
         match i with
@@ -718,6 +919,7 @@ module SpirVWriter =
 
     let writeStream (o : Stream) (instructions : list<Instruction>) = 
         let raw = instructions |> List.map toRawInstruction
-        RawWriter.write o raw
+        let maxId = instructions |> List.choose SpirVReflector.tryGetId |> List.max
+        RawWriter.write o raw maxId
 
 

@@ -44,12 +44,9 @@ let main argv =
             GLSLang.SpirV.SpirVWriter.writeStream memOut instructions
             memOut.Flush()
 
-            let cmp = memOut.ToArray()
-            let theirs = Array.sub spirv (5*4) (spirv.Length - 5*4)
-            let mine = Array.sub cmp (5*4) (cmp.Length - 5*4)
-
-            printfn "theirs: %A" theirs.Length
-            printfn "mine: %A" mine.Length
+    
+            let theirs = spirv
+            let mine = memOut.ToArray()
 
             let equalLength = theirs.Length = mine.Length
             let equal = equalLength && Array.forall2 (=) theirs mine

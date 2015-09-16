@@ -692,12 +692,13 @@ module private RawWriter =
             x.Write(BitConverter.GetBytes(u), 0, sizeof<uint32>)
             
 
-    let write (s : Stream) (instructions : list<RawInstruction>) =
+    let write (s : Stream) (instructions : list<RawInstruction>) (maxId : uint32) =
         s.WriteUInt32(SV_MAGIC)
         s.WriteUInt32(99u)
-        s.WriteUInt32(0xDEADBEEFu)
-        s.WriteUInt32(1000u)
+        s.WriteUInt32(0x051A00BBu)
+        s.WriteUInt32(maxId + 1u)
         s.WriteUInt32(0u)
+
 
         for i in instructions do
             let wordCount = uint16(i.operands.Length / 4) + 1us
