@@ -6,60 +6,28 @@ open Microsoft.FSharp.NativeInterop
 #nowarn "9"
 #nowarn "51"
 
+type ShLanguage =
+    | Vertex = 0
+    | TessControl = 1
+    | TessEvaluation = 2
+    | Geometry = 3
+    | Fragment = 4
+    | Compute = 5
 
-type private cstr = nativeptr<byte>
+type ShOptimizationLevel =
+    | NoGeneration = 0
+    | None = 1
+    | Simple = 2
+    | Full = 3
 
-
-type EShLanguage =
-    | EShLangVertex = 0
-    | EShLangTessControl = 1
-    | EShLangTessEvaluation = 2
-    | EShLangGeometry = 3
-    | EShLangFragment = 4
-    | EShLangCompute = 5
-    | EShLangCount = 6
-
-type EShLanguageMask =
-    | EShLangVertexMask         = 0x00000001
-    | EShLangTessControlMask    = 0x00000002
-    | EShLangTessEvaluationMask = 0x00000004
-    | EShLangGeometryMask       = 0x00000008
-    | EShLangFragmentMask       = 0x00000010
-    | EShLangComputeMask        = 0x00000020
-
-type EShExecutable =
-    | EShExVertexFragment = 0
-    | EShExFragment = 1
-
-type EShOptimizationLevel =
-    | EShOptNoGeneration = 0
-    | EShOptNone = 1
-    | EShOptSimple = 2
-    | EShOptFull = 3
-
-type EshMessages =
-    | EShMsgDefault          = 0x0000000  // default is to give all required errors and extra warnings
-    | EShMsgRelaxedErrors    = 0x0000001  // be liberal in accepting input
-    | EShMsgSuppressWarnings = 0x0000002  // suppress all warnings, except those required by the specification
-    | EShMsgAST              = 0x0000004  // print the AST intermediate representation
-    | EShMsgSpvRules         = 0x0000008  // issue messages for SPIR-V generation
-    | EShMsgVulkanRules      = 0x0000010  // issue messages for Vulkan-requirements of GLSL for SPIR-V
-    | EShMsgOnlyPreprocessor = 0x0000020  // only print out errors produced by the preprocessor
-
-    
-[<StructLayout(LayoutKind.Sequential)>]
-type ShBinding =
-    struct
-        val mutable public name : cstr
-        val mutable public binding : int
-    end
-
-[<StructLayout(LayoutKind.Sequential)>]
-type ShBindingTable =
-    struct
-        val mutable public numBindings : int
-        val mutable public bindings : nativeptr<ShBinding>
-    end
+type ShMessages =
+    | Default          = 0x0000000  // default is to give all required errors and extra warnings
+    | RelaxedErrors    = 0x0000001  // be liberal in accepting input
+    | SuppressWarnings = 0x0000002  // suppress all warnings, except those required by the specification
+    | AST              = 0x0000004  // print the AST intermediate representation
+    | SpvRules         = 0x0000008  // issue messages for SPIR-V generation
+    | VulkanRules      = 0x0000010  // issue messages for Vulkan-requirements of GLSL for SPIR-V
+    | OnlyPreprocessor = 0x0000020  // only print out errors produced by the preprocessor
 
 [<StructLayout(LayoutKind.Sequential)>]
 type TLimits =
@@ -73,8 +41,23 @@ type TLimits =
         val mutable public generalSamplerIndexing : int
         val mutable public generalVariableIndexing : int
         val mutable public generalConstantMatrixVectorIndexing : int
+
+        static member Default =
+            TLimits(
+                nonInductiveForLoops = 1,
+                whileLoops = 1,
+                doWhileLoops = 1,
+                generalUniformIndexing = 1,
+                generalAttributeMatrixVectorIndexing = 1,
+                generalVaryingIndexing = 1,
+                generalSamplerIndexing = 1,
+                generalVariableIndexing = 1,
+                generalConstantMatrixVectorIndexing = 1
+            )
+
     end
 
+[<StructLayout(LayoutKind.Sequential)>]
 type TBuiltInResource =
     struct
         val mutable public maxLights : int
@@ -162,91 +145,192 @@ type TBuiltInResource =
         val mutable public maxSamples : int
 
         val mutable public limits : TLimits
+
+        static member Default =
+            TBuiltInResource(
+                maxLights = 32,
+                maxClipPlanes = 6,
+                maxTextureUnits = 32,
+                maxTextureCoords = 32,
+                maxVertexAttribs = 64,
+                maxVertexUniformComponents = 4096,
+                maxVaryingFloats = 64,
+                maxVertexTextureImageUnits = 32,
+                maxCombinedTextureImageUnits = 80,
+                maxTextureImageUnits = 32,
+                maxFragmentUniformComponents = 4096,
+                maxDrawBuffers = 32,
+                maxVertexUniformVectors = 128,
+                maxVaryingVectors = 8,
+                maxFragmentUniformVectors = 16,
+                maxVertexOutputVectors = 16,
+                maxFragmentInputVectors = 15,
+                minProgramTexelOffset = 8,
+                maxProgramTexelOffset = 7,
+                maxClipDistances = 8,
+                maxComputeWorkGroupCountX = 65535,
+                maxComputeWorkGroupCountY = 65535,
+                maxComputeWorkGroupCountZ = 65535,
+                maxComputeWorkGroupSizeX = 1024,
+                maxComputeWorkGroupSizeY = 1024,
+                maxComputeWorkGroupSizeZ = 64,
+                maxComputeUniformComponents = 1024,
+                maxComputeTextureImageUnits = 16,
+                maxComputeImageUniforms = 8,
+                maxComputeAtomicCounters = 8,
+                maxComputeAtomicCounterBuffers = 1,
+                maxVaryingComponents = 60 ,
+                maxVertexOutputComponents = 64,
+                maxGeometryInputComponents = 64,
+                maxGeometryOutputComponents = 128,
+                maxFragmentInputComponents = 128,
+                maxImageUnits = 8,
+                maxCombinedImageUnitsAndFragmentOutputs = 8,
+                maxCombinedShaderOutputResources = 8,
+                maxImageSamples = 0,
+                maxVertexImageUniforms = 0,
+                maxTessControlImageUniforms = 0,
+                maxTessEvaluationImageUniforms = 0,
+                maxGeometryImageUniforms = 0,
+                maxFragmentImageUniforms = 8,
+                maxCombinedImageUniforms = 8,
+                maxGeometryTextureImageUnits = 16,
+                maxGeometryOutputVertices = 256,
+                maxGeometryTotalOutputComponents = 1024,
+                maxGeometryUniformComponents = 1024,
+                maxGeometryVaryingComponents = 64,
+                maxTessControlInputComponents = 128,
+                maxTessControlOutputComponents = 128,
+                maxTessControlTextureImageUnits = 16,
+                maxTessControlUniformComponents = 1024,
+                maxTessControlTotalOutputComponents = 4096,
+                maxTessEvaluationInputComponents = 128,
+                maxTessEvaluationOutputComponents = 128,
+                maxTessEvaluationTextureImageUnits = 16,
+                maxTessEvaluationUniformComponents = 1024,
+                maxTessPatchComponents = 120,
+                maxPatchVertices = 32,
+                maxTessGenLevel = 64,
+                maxViewports = 16,
+                maxVertexAtomicCounters = 0,
+                maxTessControlAtomicCounters = 0,
+                maxTessEvaluationAtomicCounters = 0,
+                maxGeometryAtomicCounters = 0,
+                maxFragmentAtomicCounters = 8,
+                maxCombinedAtomicCounters = 8,
+                maxAtomicCounterBindings = 1,
+                maxVertexAtomicCounterBuffers = 0,
+                maxTessControlAtomicCounterBuffers = 0,
+                maxTessEvaluationAtomicCounterBuffers = 0,
+                maxGeometryAtomicCounterBuffers = 0,
+                maxFragmentAtomicCounterBuffers = 1,
+                maxCombinedAtomicCounterBuffers = 1,
+                maxAtomicCounterBufferSize = 16384,
+                maxTransformFeedbackBuffers = 4,
+                maxTransformFeedbackInterleavedComponents = 64,
+                maxCullDistances = 8,
+                maxCombinedClipAndCullDistances = 8,
+                maxSamples = 4,
+                limits = TLimits.Default
+            )
+
+
     end
 
-type ShHandle = nativeint
+type Shader = nativeint
+type Program = nativeint
 
 module GLSLang =
-
     
     [<Literal>]
-    let lib = "glslang"
-
-    [<DllImport(lib)>]
-    extern int ShInitialize()
-
-    [<DllImport(lib)>]
-    extern int ShFinalize()
+    let lib = "spirv"
 
 
     [<DllImport(lib)>]
-    extern ShHandle ShConstructCompiler(EShLanguage language, int debugOptions)
+    extern bool ShInitializeProcess()
 
     [<DllImport(lib)>]
-    extern ShHandle ShConstructLinker(EShExecutable, int debugOptions)
+    extern void ShFinalizeProcess()
+
+
 
     [<DllImport(lib)>]
-    extern ShHandle ShConstructUniformMap()
+    extern Shader ShCreateShader(ShLanguage language)
 
     [<DllImport(lib)>]
-    extern void ShDestruct(ShHandle handle)
+    extern void ShDestroyShader(Shader shader)
+
+    [<DllImport(lib, EntryPoint = "ShSetShaderSource")>]
+    extern bool ShSetShaderSource(Shader shader, nativeint shaderStrings, nativeint shaderStringLength, int numSources)
+    //extern bool ShSetShaderSource(Shader shader, byte* shaderString, int shaderStringLength)
+
+//    let ShSetShaderSource(shader : Shader, shaderString : string) =
+//        let arr = System.Text.ASCIIEncoding.ASCII.GetBytes shaderString
+//        let ptr = NativePtr.ofNativeInt (Marshal.AllocHGlobal (arr.Length + 1))
+//        for i in 0..arr.Length-1 do NativePtr.set ptr i arr.[i]
+//        NativePtr.set ptr arr.Length 0uy
+//        
+//        ShSetShaderSource_(shader, ptr, shaderString.Length)
 
     [<DllImport(lib)>]
-    extern int ShCompile(
-        ShHandle handle,
-        cstr* shaderStrings,
-        int numStrings,
-        int* lengths,
-        EShOptimizationLevel optimizationLevel,
-        TBuiltInResource* resources,
-        int debugOptions,
-        int defaultVersion,
-        bool forwardCompatible,
-        EshMessages messages
-    )
+    extern bool ShParseShader(Shader shader, TBuiltInResource* resources, int defaultVersion, bool forwardCompatible, ShMessages messages)
+
+    [<DllImport(lib, EntryPoint = "ShGetShaderInfoLog")>]
+    extern nativeint private ShGetShaderInfoLog_(Shader shader)
+
+    let ShGetShaderInfoLog (shader : Shader) =
+        let ptr = ShGetShaderInfoLog_(shader)
+        Marshal.PtrToStringAnsi ptr
+
+    [<DllImport(lib, EntryPoint = "ShGetShaderInfoDebugLog")>]
+    extern nativeint private ShGetShaderInfoDebugLog_(Shader shader)
+
+    let ShGetShaderInfoDebugLog (shader : Shader) =
+        let ptr = ShGetShaderInfoDebugLog_(shader)
+        Marshal.PtrToStringAnsi ptr
 
 
-    type private int16arr = nativeptr<int16>
-
-    [<DllImport(lib)>]
-    extern int ShLink(
-        ShHandle handle,
-        ShHandle* h,
-        int numHandles,
-        ShHandle uniformMap,
-        int16arr* uniformsAccessed,
-        int* numUniformsAccessed
-    )
 
     [<DllImport(lib)>]
-    extern int ShLinkExt(
-        ShHandle handle,
-        ShHandle* h,
-        int numHandles
-    )
+    extern Program ShCreateProgram()
 
     [<DllImport(lib)>]
-    extern void ShSetEncryptionMethod(ShHandle handle)
+    extern void ShDestroyProgram(Program program)
 
     [<DllImport(lib)>]
-    extern string ShGetInfoLog(ShHandle handle)
+    extern bool ShAddShader(Program program, Shader shader)
 
     [<DllImport(lib)>]
-    extern nativeint ShGetExecutable(ShHandle handle)
+    extern bool ShLinkProgram(Program program, ShMessages messages)
+
+    [<DllImport(lib, EntryPoint = "ShGetProgramInfoLog")>]
+    extern nativeint private ShGetProgramInfoLog_(Program shader)
+
+    let ShGetProgramInfoLog (program : Program) =
+        let ptr = ShGetProgramInfoLog_(program)
+        Marshal.PtrToStringAnsi ptr
+
+    [<DllImport(lib, EntryPoint = "ShGetProgramInfoDebugLog")>]
+    extern nativeint private ShGetProgramInfoDebugLog_(Program shader)
+
+    let ShGetProgramInfoDebugLog (program : Program) =
+        let ptr = ShGetProgramInfoDebugLog_(program)
+        Marshal.PtrToStringAnsi ptr
+
+
+    [<DllImport(lib, EntryPoint = "ShGetSpirVForProgramStage")>]
+    extern nativeint private ShGetSpirVForProgramStage_(Program program, ShLanguage stage, uint64* size)
 
     [<DllImport(lib)>]
-    extern int ShSetVirtualAttributeBindings(ShHandle handle, ShBindingTable* table)
+    extern void private ShFreeSpirV(nativeint data, uint64 size)
+    
+    let ShGetSpirVForProgramStage(program : Program, stage : ShLanguage) =
+        let mutable size = 0UL
+        let ptr = ShGetSpirVForProgramStage_(program, stage, &&size)
 
-    [<DllImport(lib)>]
-    extern int ShSetFixedAttributeBindings(ShHandle handle, ShBindingTable* table)
-
-    type private ShBindingTablePtr = nativeptr<ShBindingTable>
-
-    [<DllImport(lib)>]
-    extern int ShGetPhysicalAttributeBindings(ShHandle handle, ShBindingTablePtr* table)
-
-    [<DllImport(lib)>]
-    extern int ShExcludeAttributes(ShHandle handle, int *attributes, int count)
-
-    [<DllImport(lib)>]
-    extern int ShGetUniformLocation(ShHandle uniformMap, string name)
+        if ptr = 0n then null
+        else
+            let data : byte[] = Array.zeroCreate (int size)
+            try Marshal.Copy(ptr, data, 0, data.Length)
+            finally ShFreeSpirV(ptr, size)
+            data

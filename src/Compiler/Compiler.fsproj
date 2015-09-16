@@ -54,6 +54,13 @@
     <Compile Include="Program.fs" />
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GLSLangSharp\GLSLangSharp.fsproj">
+      <Name>GLSLangSharp</Name>
+      <Project>{33e987bb-93ab-41ab-b44f-1b7bdef61425}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
   </PropertyGroup>

@@ -8,3 +8,11 @@ bin/Debug
 /src/*.suo
 /bin/*.nupkg
 /src/.vs
+/src/spirv/.vs/spirv/v14/*.suo
+/src/spirv/ipch/SPIRV-f3deb11b/*.ipch
+Debug
+Release
+x64
+/src/spirv/*.sdf
+/src/spirv/spirv/*.user
+/src/spirv/*.opensdf
