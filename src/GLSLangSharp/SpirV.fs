@@ -7,7 +7,7 @@ type Instruction =
     | Undef of resType : uint32 * resId : uint32
     | Source of language : SourceLanguage * version : uint32
     | SourceExtension of extension : string
-    | Name of target : uint32
+    | Name of target : uint32 * name : string
     | MemberName of _type : uint32 * mem : uint32 * name : string
     | String of resId : uint32 * value : string
     | Line of target : uint32 * file : uint32 * line : uint32 * col : uint32
@@ -57,7 +57,7 @@ type Instruction =
     | Variable of resType : uint32 * resId : uint32 * storageClas : StorageClass * initializers : uint32[]
     | ImageTexelPointer of resType : uint32 * resId : uint32 * image : uint32 * coordinate : Dim * sample : uint32
     | Load of resType : uint32 * resId : uint32 * pointer : uint32 * memoryAccess : uint32[]
-    | Store of resType : uint32 * resId : uint32 * pointer : uint32 * ob : uint32 * memoryAccess : uint32[]
+    | Store of pointer : uint32 * ob : uint32 * memoryAccess : uint32[]
     | CopyMemory of target : uint32 * source : uint32 * memoryAccess : uint32[]
     | CopyMemorySized of target : uint32 * source : uint32 * size : uint32 * memoryAccess : uint32[]
     | AccessChain of resType : uint32 * resId : uint32 * _base : uint32 * indices : uint32[]
@@ -213,6 +213,28 @@ type Instruction =
     | Unreachable
     | LifetimeStart of ptr : uint32 * size : uint32
     | LifetimeStop of ptr : uint32 * size : uint32
+    | AtomicLoad of resType : uint32 * resId : uint32 * ptr : uint32 * scope : Scope * sem : MemorySemantics
+    | AtomicStore of resType : uint32 * resId : uint32 * ptr : uint32 * scope : Scope * value : uint32
+    | AtomicExchange of resType : uint32 * resId : uint32 * ptr : uint32 * scope : Scope * sem : MemorySemantics * value : uint32
+    | AtomicCompareExchange of resType : uint32 * resId : uint32 * ptr : uint32 * scope : Scope * _equal : MemorySemantics * _unequal : MemorySemantics * value : uint32 * cmp : uint32
+    | AtomicCompareExchangeWeak of resType : uint32 * resId : uint32 * ptr : uint32 * scope : Scope * _equal : MemorySemantics * _unequal : MemorySemantics * value : uint32 * cmp : uint32
+    | AtomicIIncrement of resType : uint32 * resId : uint32 * ptr : uint32 * scope : Scope * sem : MemorySemantics
+    | AtomicIDecrement of resType : uint32 * resId : uint32 * ptr : uint32 * scope : Scope * sem : MemorySemantics
+    | AtomicIAdd of resType : uint32 * resId : uint32 * ptr : uint32 * scope : Scope * sem : MemorySemantics * value : uint32
+    | AtomicISub of resType : uint32 * resId : uint32 * ptr : uint32 * scope : Scope * sem : MemorySemantics * value : uint32
+    | AtomicSMin of resType : uint32 * resId : uint32 * ptr : uint32 * scope : Scope * sem : MemorySemantics * value : uint32
+    | AtomicUMin of resType : uint32 * resId : uint32 * ptr : uint32 * scope : Scope * sem : MemorySemantics * value : uint32
+    | AtomicSMax of resType : uint32 * resId : uint32 * ptr : uint32 * scope : Scope * sem : MemorySemantics * value : uint32
+    | AtomicUMax of resType : uint32 * resId : uint32 * ptr : uint32 * scope : Scope * sem : MemorySemantics * value : uint32
+    | AtomicAnd of resType : uint32 * resId : uint32 * ptr : uint32 * scope : Scope * sem : MemorySemantics * value : uint32
+    | AtomicOr of resType : uint32 * resId : uint32 * ptr : uint32 * scope : Scope * sem : MemorySemantics * value : uint32
+    | AtomicXor of resType : uint32 * resId : uint32 * ptr : uint32 * scope : Scope * sem : MemorySemantics * value : uint32
+    | EmitVertex
+    | EndPrimitive
+    | EmitStreamVertex of stream : uint32
+    | EndStreamPrimitive of stream : uint32
+    | ControlBarrier of exec : Scope * mem : Scope * sem : MemorySemantics
+    | MemoryBarrier of mem : Scope * sem : MemorySemantics
 
 
 module SpirVReader = 
@@ -223,7 +245,7 @@ module SpirVReader =
             | OpCode.Undef -> Undef(args.UInt32 0, args.UInt32 1)
             | OpCode.Source -> Source(args.UInt32 0 |> unbox<SourceLanguage>, args.UInt32 1)
             | OpCode.SourceExtension -> SourceExtension(args.String 0)
-            | OpCode.Name -> Name(args.UInt32 0)
+            | OpCode.Name -> Name(args.UInt32 0, args.String 4)
             | OpCode.MemberName -> MemberName(args.UInt32 0, args.UInt32 1, args.String 8)
             | OpCode.String -> String(args.UInt32 0, args.String 4)
             | OpCode.Line -> Line(args.UInt32 0, args.UInt32 1, args.UInt32 2, args.UInt32 3)
@@ -273,7 +295,7 @@ module SpirVReader =
             | OpCode.Variable -> Variable(args.UInt32 0, args.UInt32 1, args.UInt32 2 |> unbox<StorageClass>, args.UInt32Array 3)
             | OpCode.ImageTexelPointer -> ImageTexelPointer(args.UInt32 0, args.UInt32 1, args.UInt32 2, args.UInt32 3 |> unbox<Dim>, args.UInt32 4)
             | OpCode.Load -> Load(args.UInt32 0, args.UInt32 1, args.UInt32 2, args.UInt32Array 3)
-            | OpCode.Store -> Store(args.UInt32 0, args.UInt32 1, args.UInt32 2, args.UInt32 3, args.UInt32Array 4)
+            | OpCode.Store -> Store(args.UInt32 0, args.UInt32 1, args.UInt32Array 2)
             | OpCode.CopyMemory -> CopyMemory(args.UInt32 0, args.UInt32 1, args.UInt32Array 2)
             | OpCode.CopyMemorySized -> CopyMemorySized(args.UInt32 0, args.UInt32 1, args.UInt32 2, args.UInt32Array 3)
             | OpCode.AccessChain -> AccessChain(args.UInt32 0, args.UInt32 1, args.UInt32 2, args.UInt32Array 3)
@@ -429,6 +451,28 @@ module SpirVReader =
             | OpCode.Unreachable -> Unreachable
             | OpCode.LifetimeStart -> LifetimeStart(args.UInt32 0, args.UInt32 1)
             | OpCode.LifetimeStop -> LifetimeStop(args.UInt32 0, args.UInt32 1)
+            | OpCode.AtomicLoad -> AtomicLoad(args.UInt32 0, args.UInt32 1, args.UInt32 2, args.UInt32 3 |> unbox<Scope>, args.UInt32 4 |> unbox<MemorySemantics>)
+            | OpCode.AtomicStore -> AtomicStore(args.UInt32 0, args.UInt32 1, args.UInt32 2, args.UInt32 3 |> unbox<Scope>, args.UInt32 4)
+            | OpCode.AtomicExchange -> AtomicExchange(args.UInt32 0, args.UInt32 1, args.UInt32 2, args.UInt32 3 |> unbox<Scope>, args.UInt32 4 |> unbox<MemorySemantics>, args.UInt32 5)
+            | OpCode.AtomicCompareExchange -> AtomicCompareExchange(args.UInt32 0, args.UInt32 1, args.UInt32 2, args.UInt32 3 |> unbox<Scope>, args.UInt32 4 |> unbox<MemorySemantics>, args.UInt32 5 |> unbox<MemorySemantics>, args.UInt32 6, args.UInt32 7)
+            | OpCode.AtomicCompareExchangeWeak -> AtomicCompareExchangeWeak(args.UInt32 0, args.UInt32 1, args.UInt32 2, args.UInt32 3 |> unbox<Scope>, args.UInt32 4 |> unbox<MemorySemantics>, args.UInt32 5 |> unbox<MemorySemantics>, args.UInt32 6, args.UInt32 7)
+            | OpCode.AtomicIIncrement -> AtomicIIncrement(args.UInt32 0, args.UInt32 1, args.UInt32 2, args.UInt32 3 |> unbox<Scope>, args.UInt32 4 |> unbox<MemorySemantics>)
+            | OpCode.AtomicIDecrement -> AtomicIDecrement(args.UInt32 0, args.UInt32 1, args.UInt32 2, args.UInt32 3 |> unbox<Scope>, args.UInt32 4 |> unbox<MemorySemantics>)
+            | OpCode.AtomicIAdd -> AtomicIAdd(args.UInt32 0, args.UInt32 1, args.UInt32 2, args.UInt32 3 |> unbox<Scope>, args.UInt32 4 |> unbox<MemorySemantics>, args.UInt32 5)
+            | OpCode.AtomicISub -> AtomicISub(args.UInt32 0, args.UInt32 1, args.UInt32 2, args.UInt32 3 |> unbox<Scope>, args.UInt32 4 |> unbox<MemorySemantics>, args.UInt32 5)
+            | OpCode.AtomicSMin -> AtomicSMin(args.UInt32 0, args.UInt32 1, args.UInt32 2, args.UInt32 3 |> unbox<Scope>, args.UInt32 4 |> unbox<MemorySemantics>, args.UInt32 5)
+            | OpCode.AtomicUMin -> AtomicUMin(args.UInt32 0, args.UInt32 1, args.UInt32 2, args.UInt32 3 |> unbox<Scope>, args.UInt32 4 |> unbox<MemorySemantics>, args.UInt32 5)
+            | OpCode.AtomicSMax -> AtomicSMax(args.UInt32 0, args.UInt32 1, args.UInt32 2, args.UInt32 3 |> unbox<Scope>, args.UInt32 4 |> unbox<MemorySemantics>, args.UInt32 5)
+            | OpCode.AtomicUMax -> AtomicUMax(args.UInt32 0, args.UInt32 1, args.UInt32 2, args.UInt32 3 |> unbox<Scope>, args.UInt32 4 |> unbox<MemorySemantics>, args.UInt32 5)
+            | OpCode.AtomicAnd -> AtomicAnd(args.UInt32 0, args.UInt32 1, args.UInt32 2, args.UInt32 3 |> unbox<Scope>, args.UInt32 4 |> unbox<MemorySemantics>, args.UInt32 5)
+            | OpCode.AtomicOr -> AtomicOr(args.UInt32 0, args.UInt32 1, args.UInt32 2, args.UInt32 3 |> unbox<Scope>, args.UInt32 4 |> unbox<MemorySemantics>, args.UInt32 5)
+            | OpCode.AtomicXor -> AtomicXor(args.UInt32 0, args.UInt32 1, args.UInt32 2, args.UInt32 3 |> unbox<Scope>, args.UInt32 4 |> unbox<MemorySemantics>, args.UInt32 5)
+            | OpCode.EmitVertex -> EmitVertex
+            | OpCode.EndPrimitive -> EndPrimitive
+            | OpCode.EmitStreamVertex -> EmitStreamVertex(args.UInt32 0)
+            | OpCode.EndStreamPrimitive -> EndStreamPrimitive(args.UInt32 0)
+            | OpCode.ControlBarrier -> ControlBarrier(args.UInt32 0 |> unbox<Scope>, args.UInt32 1 |> unbox<Scope>, args.UInt32 2 |> unbox<MemorySemantics>)
+            | OpCode.MemoryBarrier -> MemoryBarrier(args.UInt32 0 |> unbox<Scope>, args.UInt32 1 |> unbox<MemorySemantics>)
             | code -> failwithf "unknown OpCode: %A" code
 
     let readStream (i : Stream) = 
@@ -443,7 +487,7 @@ module SpirVWriter =
             | Undef(resType, resId) -> { opCode = OpCode.Undef; operands = RawOperands(resType, resId) }
             | Source(language, version) -> { opCode = OpCode.Source; operands = RawOperands(language, version) }
             | SourceExtension(extension) -> { opCode = OpCode.SourceExtension; operands = RawOperands(extension) }
-            | Name(target) -> { opCode = OpCode.Name; operands = RawOperands(target) }
+            | Name(target, name) -> { opCode = OpCode.Name; operands = RawOperands(target, name) }
             | MemberName(_type, mem, name) -> { opCode = OpCode.MemberName; operands = RawOperands(_type, mem, name) }
             | String(resId, value) -> { opCode = OpCode.String; operands = RawOperands(resId, value) }
             | Line(target, file, line, col) -> { opCode = OpCode.Line; operands = RawOperands(target, file, line, col) }
@@ -493,7 +537,7 @@ module SpirVWriter =
             | Variable(resType, resId, storageClas, initializers) -> { opCode = OpCode.Variable; operands = RawOperands(resType, resId, storageClas, initializers) }
             | ImageTexelPointer(resType, resId, image, coordinate, sample) -> { opCode = OpCode.ImageTexelPointer; operands = RawOperands(resType, resId, image, coordinate, sample) }
             | Load(resType, resId, pointer, memoryAccess) -> { opCode = OpCode.Load; operands = RawOperands(resType, resId, pointer, memoryAccess) }
-            | Store(resType, resId, pointer, ob, memoryAccess) -> { opCode = OpCode.Store; operands = RawOperands(resType, resId, pointer, ob, memoryAccess) }
+            | Store(pointer, ob, memoryAccess) -> { opCode = OpCode.Store; operands = RawOperands(pointer, ob, memoryAccess) }
             | CopyMemory(target, source, memoryAccess) -> { opCode = OpCode.CopyMemory; operands = RawOperands(target, source, memoryAccess) }
             | CopyMemorySized(target, source, size, memoryAccess) -> { opCode = OpCode.CopyMemorySized; operands = RawOperands(target, source, size, memoryAccess) }
             | AccessChain(resType, resId, _base, indices) -> { opCode = OpCode.AccessChain; operands = RawOperands(resType, resId, _base, indices) }
@@ -649,6 +693,28 @@ module SpirVWriter =
             | Unreachable -> { opCode = OpCode.Unreachable; operands = RawOperands() }
             | LifetimeStart(ptr, size) -> { opCode = OpCode.LifetimeStart; operands = RawOperands(ptr, size) }
             | LifetimeStop(ptr, size) -> { opCode = OpCode.LifetimeStop; operands = RawOperands(ptr, size) }
+            | AtomicLoad(resType, resId, ptr, scope, sem) -> { opCode = OpCode.AtomicLoad; operands = RawOperands(resType, resId, ptr, scope, sem) }
+            | AtomicStore(resType, resId, ptr, scope, value) -> { opCode = OpCode.AtomicStore; operands = RawOperands(resType, resId, ptr, scope, value) }
+            | AtomicExchange(resType, resId, ptr, scope, sem, value) -> { opCode = OpCode.AtomicExchange; operands = RawOperands(resType, resId, ptr, scope, sem, value) }
+            | AtomicCompareExchange(resType, resId, ptr, scope, _equal, _unequal, value, cmp) -> { opCode = OpCode.AtomicCompareExchange; operands = RawOperands(resType, resId, ptr, scope, _equal, _unequal, value, cmp) }
+            | AtomicCompareExchangeWeak(resType, resId, ptr, scope, _equal, _unequal, value, cmp) -> { opCode = OpCode.AtomicCompareExchangeWeak; operands = RawOperands(resType, resId, ptr, scope, _equal, _unequal, value, cmp) }
+            | AtomicIIncrement(resType, resId, ptr, scope, sem) -> { opCode = OpCode.AtomicIIncrement; operands = RawOperands(resType, resId, ptr, scope, sem) }
+            | AtomicIDecrement(resType, resId, ptr, scope, sem) -> { opCode = OpCode.AtomicIDecrement; operands = RawOperands(resType, resId, ptr, scope, sem) }
+            | AtomicIAdd(resType, resId, ptr, scope, sem, value) -> { opCode = OpCode.AtomicIAdd; operands = RawOperands(resType, resId, ptr, scope, sem, value) }
+            | AtomicISub(resType, resId, ptr, scope, sem, value) -> { opCode = OpCode.AtomicISub; operands = RawOperands(resType, resId, ptr, scope, sem, value) }
+            | AtomicSMin(resType, resId, ptr, scope, sem, value) -> { opCode = OpCode.AtomicSMin; operands = RawOperands(resType, resId, ptr, scope, sem, value) }
+            | AtomicUMin(resType, resId, ptr, scope, sem, value) -> { opCode = OpCode.AtomicUMin; operands = RawOperands(resType, resId, ptr, scope, sem, value) }
+            | AtomicSMax(resType, resId, ptr, scope, sem, value) -> { opCode = OpCode.AtomicSMax; operands = RawOperands(resType, resId, ptr, scope, sem, value) }
+            | AtomicUMax(resType, resId, ptr, scope, sem, value) -> { opCode = OpCode.AtomicUMax; operands = RawOperands(resType, resId, ptr, scope, sem, value) }
+            | AtomicAnd(resType, resId, ptr, scope, sem, value) -> { opCode = OpCode.AtomicAnd; operands = RawOperands(resType, resId, ptr, scope, sem, value) }
+            | AtomicOr(resType, resId, ptr, scope, sem, value) -> { opCode = OpCode.AtomicOr; operands = RawOperands(resType, resId, ptr, scope, sem, value) }
+            | AtomicXor(resType, resId, ptr, scope, sem, value) -> { opCode = OpCode.AtomicXor; operands = RawOperands(resType, resId, ptr, scope, sem, value) }
+            | EmitVertex -> { opCode = OpCode.EmitVertex; operands = RawOperands() }
+            | EndPrimitive -> { opCode = OpCode.EndPrimitive; operands = RawOperands() }
+            | EmitStreamVertex(stream) -> { opCode = OpCode.EmitStreamVertex; operands = RawOperands(stream) }
+            | EndStreamPrimitive(stream) -> { opCode = OpCode.EndStreamPrimitive; operands = RawOperands(stream) }
+            | ControlBarrier(exec, mem, sem) -> { opCode = OpCode.ControlBarrier; operands = RawOperands(exec, mem, sem) }
+            | MemoryBarrier(mem, sem) -> { opCode = OpCode.MemoryBarrier; operands = RawOperands(mem, sem) }
 
     let writeStream (o : Stream) (instructions : list<Instruction>) = 
         let raw = instructions |> List.map toRawInstruction

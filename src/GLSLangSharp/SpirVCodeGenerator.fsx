@@ -28,7 +28,7 @@ let prototypes =
         // Debug
         { opCode = OpCode.Source; args = [Arg("language", typeof<SourceLanguage>); Arg("version", typeof<int>)] }
         { opCode = OpCode.SourceExtension; args = [Arg("extension", typeof<string>)] }
-        { opCode = OpCode.Name; args = [Arg("target", typeof<int>)] }
+        { opCode = OpCode.Name; args = [Arg("target", typeof<int>); Arg("name", typeof<string>)] }
         { opCode = OpCode.MemberName; args = [Arg("_type", typeof<int>); Arg("mem", typeof<int>); Arg("name", typeof<string>)] }
         { opCode = OpCode.String; args = [ResultId; Arg("value", typeof<string>)] }
         { opCode = OpCode.Line; args = [Arg("target", typeof<int>); Arg("file", typeof<int>); Arg("line", typeof<int>); Arg("col", typeof<int>)] }
@@ -92,7 +92,7 @@ let prototypes =
         { opCode = OpCode.Variable; args = [ResultType; ResultId; Arg("storageClas", typeof<StorageClass>); Arg("initializers", typeof<int[]>)] }
         { opCode = OpCode.ImageTexelPointer; args = [ResultType; ResultId; Arg("image", typeof<int>); Arg("coordinate", typeof<Dim>); Arg("sample", typeof<int>)] }
         { opCode = OpCode.Load; args = [ResultType; ResultId; Arg("pointer", typeof<int>); Arg("memoryAccess", typeof<int[]>)] }
-        { opCode = OpCode.Store; args = [ResultType; ResultId; Arg("pointer", typeof<int>); Arg("ob", typeof<int>); Arg("memoryAccess", typeof<int[]>)] }
+        { opCode = OpCode.Store; args = [Arg("pointer", typeof<int>); Arg("ob", typeof<int>); Arg("memoryAccess", typeof<int[]>)] }
         { opCode = OpCode.CopyMemory; args = [Arg("target", typeof<int>); Arg("source", typeof<int>); Arg("memoryAccess", typeof<int[]>)] }
         { opCode = OpCode.CopyMemorySized; args = [Arg("target", typeof<int>); Arg("source", typeof<int>); Arg("size", typeof<int>); Arg("memoryAccess", typeof<int[]>)] }
         { opCode = OpCode.AccessChain; args = [ResultType; ResultId; Arg("_base", typeof<int>); Arg("indices", typeof<int[]>)] }
@@ -270,13 +270,34 @@ let prototypes =
         { opCode = OpCode.LifetimeStop; args = [Arg("ptr", typeof<int>); Arg("size", typeof<int>)] }
 
         // Atomics
-
-
+        { opCode = OpCode.AtomicLoad; args = [ResultType; ResultId; Arg("ptr", typeof<int>); Arg("scope", typeof<Scope>); Arg("sem", typeof<MemorySemantics>)] }
+        { opCode = OpCode.AtomicStore; args = [ResultType; ResultId; Arg("ptr", typeof<int>); Arg("scope", typeof<Scope>); Arg("value", typeof<int>)] }
+        { opCode = OpCode.AtomicExchange; args = [ResultType; ResultId; Arg("ptr", typeof<int>); Arg("scope", typeof<Scope>); Arg("sem", typeof<MemorySemantics>); Arg("value", typeof<int>)] }
+        { opCode = OpCode.AtomicCompareExchange; args = [ResultType; ResultId; Arg("ptr", typeof<int>); Arg("scope", typeof<Scope>); Arg("_equal", typeof<MemorySemantics>); Arg("_unequal", typeof<MemorySemantics>); Arg("value", typeof<int>); Arg("cmp", typeof<int>)] }
+        { opCode = OpCode.AtomicCompareExchangeWeak; args = [ResultType; ResultId; Arg("ptr", typeof<int>); Arg("scope", typeof<Scope>); Arg("_equal", typeof<MemorySemantics>); Arg("_unequal", typeof<MemorySemantics>); Arg("value", typeof<int>); Arg("cmp", typeof<int>)] }
+        { opCode = OpCode.AtomicIIncrement; args = [ResultType; ResultId; Arg("ptr", typeof<int>); Arg("scope", typeof<Scope>); Arg("sem", typeof<MemorySemantics>)] }
+        { opCode = OpCode.AtomicIDecrement; args = [ResultType; ResultId; Arg("ptr", typeof<int>); Arg("scope", typeof<Scope>); Arg("sem", typeof<MemorySemantics>)] }
+        { opCode = OpCode.AtomicIAdd; args = [ResultType; ResultId; Arg("ptr", typeof<int>); Arg("scope", typeof<Scope>); Arg("sem", typeof<MemorySemantics>); Arg("value", typeof<int>)] }
+        { opCode = OpCode.AtomicISub; args = [ResultType; ResultId; Arg("ptr", typeof<int>); Arg("scope", typeof<Scope>); Arg("sem", typeof<MemorySemantics>); Arg("value", typeof<int>)] }
+        { opCode = OpCode.AtomicSMin; args = [ResultType; ResultId; Arg("ptr", typeof<int>); Arg("scope", typeof<Scope>); Arg("sem", typeof<MemorySemantics>); Arg("value", typeof<int>)] }
+        { opCode = OpCode.AtomicUMin; args = [ResultType; ResultId; Arg("ptr", typeof<int>); Arg("scope", typeof<Scope>); Arg("sem", typeof<MemorySemantics>); Arg("value", typeof<int>)] }
+        { opCode = OpCode.AtomicSMax; args = [ResultType; ResultId; Arg("ptr", typeof<int>); Arg("scope", typeof<Scope>); Arg("sem", typeof<MemorySemantics>); Arg("value", typeof<int>)] }
+        { opCode = OpCode.AtomicUMax; args = [ResultType; ResultId; Arg("ptr", typeof<int>); Arg("scope", typeof<Scope>); Arg("sem", typeof<MemorySemantics>); Arg("value", typeof<int>)] }
+        { opCode = OpCode.AtomicAnd; args = [ResultType; ResultId; Arg("ptr", typeof<int>); Arg("scope", typeof<Scope>); Arg("sem", typeof<MemorySemantics>); Arg("value", typeof<int>)] }
+        { opCode = OpCode.AtomicOr; args = [ResultType; ResultId; Arg("ptr", typeof<int>); Arg("scope", typeof<Scope>); Arg("sem", typeof<MemorySemantics>); Arg("value", typeof<int>)] }
+        { opCode = OpCode.AtomicXor; args = [ResultType; ResultId; Arg("ptr", typeof<int>); Arg("scope", typeof<Scope>); Arg("sem", typeof<MemorySemantics>); Arg("value", typeof<int>)] }
+        
         // Primitive instructions
-
+        { opCode = OpCode.EmitVertex; args = [] }
+        { opCode = OpCode.EndPrimitive; args = [] }
+        { opCode = OpCode.EmitStreamVertex; args = [Arg("stream", typeof<int>)] }
+        { opCode = OpCode.EndStreamPrimitive; args = [Arg("stream", typeof<int>)] }
 
         // Barrier instructions
+        { opCode = OpCode.ControlBarrier; args = [Arg("exec", typeof<Scope>); Arg("mem", typeof<Scope>); Arg("sem", typeof<MemorySemantics>)] }
+        { opCode = OpCode.MemoryBarrier; args = [Arg("mem", typeof<Scope>); Arg("sem", typeof<MemorySemantics>)] }
 
+        // !!!currently omitted!!!!
 
         // Group instructions
 

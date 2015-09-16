@@ -514,12 +514,32 @@ type FunctionControl =
     | ConstMask = 0x00000008u
 
 type LoopControl =
-    | UnrollShift = 0u
-    | DontUnrollShift = 1u
+    | UnrollShift = 0x00000001u
+    | DontUnrollShift = 0x00000002u
 
 type SelectionControl =
-    | FlattenShift = 0u
-    | DontFlattenShift = 1u
+    | Flatten = 0x00000001u
+    | DontFlattenShift = 0x00000002u
+
+type Scope =
+    | CrossDevice = 0u
+    | Device = 1u
+    | Workgroup = 2u
+    | Subgroup = 3u
+    | Invocation = 4u
+
+type MemorySemantics =
+    | MaskNone = 0u
+    | RelaxedMask = 0x00000001u
+    | SequentiallyConsistentMask = 0x00000002u
+    | AcquireMask = 0x00000004u
+    | ReleaseMask = 0x00000008u
+    | UniformMemoryMask = 0x00000010u
+    | SubgroupMemoryMask = 0x00000020u
+    | WorkgroupLocalMemoryMask = 0x00000040u
+    | WorkgroupGlobalMemoryMask = 0x00000080u
+    | AtomicCounterMemoryMask = 0x00000100u
+    | ImageMemoryMask = 0x00000200u
 
 type RawOperands (data : byte[]) =
     member x.AsString = 
@@ -571,8 +591,15 @@ type RawOperands (data : byte[]) =
                 elif t = typeof<bool> then BitConverter.GetBytes (if unbox v then 1u else 0u)
                 elif t = typeof<string> then 
                     let arr = System.Text.ASCIIEncoding.ASCII.GetBytes (unbox<string> v)
-                    Array.append arr [|0uy|]
-                else failwith "asdsadas"
+                    let arr = Array.append arr [|0uy|]
+
+                    if arr.Length % 4 = 0 then
+                        arr
+                    else 
+                        let missing = 4 - (arr.Length % 4)
+                        Array.append arr (Array.zeroCreate missing)
+
+                else failwith "unknown argument type"
 
             )
         RawOperands(bytes)
@@ -660,5 +687,24 @@ module private RawReader =
 
 module private RawWriter =
     
+    type Stream with
+        member x.WriteUInt32(u : uint32) =
+            x.Write(BitConverter.GetBytes(u), 0, sizeof<uint32>)
+            
+
     let write (s : Stream) (instructions : list<RawInstruction>) =
+        s.WriteUInt32(SV_MAGIC)
+        s.WriteUInt32(99u)
+        s.WriteUInt32(0xDEADBEEFu)
+        s.WriteUInt32(1000u)
+        s.WriteUInt32(0u)
+
+        for i in instructions do
+            let wordCount = uint16(i.operands.Length / 4) + 1us
+            let opCode = i.opCode |> uint16
+
+            let write = ((uint32 wordCount) <<< 16) ||| (uint32 opCode)
+            s.WriteUInt32(write)
+            s.Write(i.operands.Bytes, 0, i.operands.Length)
+
         ()

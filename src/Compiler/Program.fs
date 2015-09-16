@@ -13,11 +13,13 @@ layout(binding = 0) uniform buf {
         vec4 attr[12*3];
 } ubuf;
 
+layout(location = 0) in vec4 myPos;
+
 layout (location = 0) out vec4 texcoord;
 void main() 
 {
     texcoord = ubuf.attr[gl_VertexID];
-    gl_Position = ubuf.MVP * ubuf.position[gl_VertexID];
+    gl_Position = ubuf.MVP * ubuf.position[gl_VertexID] + myPos;
 
     // GL->VK conventions
     gl_Position.y = -gl_Position.y;
@@ -32,6 +34,27 @@ let main argv =
 
     match GLSLang.tryCompileSpirVBinary ShaderStage.Vertex code with
         | Success spirv ->
+            use mem = new System.IO.MemoryStream(spirv)
+            let instructions = GLSLang.SpirV.SpirVReader.readStream mem
+
+            for i in instructions do
+                printfn "%A" i
+
+            use memOut = new System.IO.MemoryStream()
+            GLSLang.SpirV.SpirVWriter.writeStream memOut instructions
+            memOut.Flush()
+
+            let cmp = memOut.ToArray()
+            let theirs = Array.sub spirv (5*4) (spirv.Length - 5*4)
+            let mine = Array.sub cmp (5*4) (cmp.Length - 5*4)
+
+            printfn "theirs: %A" theirs.Length
+            printfn "mine: %A" mine.Length
+
+            let equalLength = theirs.Length = mine.Length
+            let equal = equalLength && Array.forall2 (=) theirs mine
+            printfn "length: %A equal: %A" equalLength equal
+
             System.IO.File.WriteAllBytes(@"C:\Users\schorsch\Desktop\test.spv", spirv)
         | Error e ->
             printfn "%s" e
