@@ -160,19 +160,114 @@ let prototypes =
         { opCode = OpCode.Transpose; args = [ResultType; ResultId; Arg("matrix", typeof<int>) ] }
 
         // Arithmetic instructions
+        { opCode = OpCode.SNegate; args = [ResultType; ResultId; Arg("value", typeof<int>) ] }
+        { opCode = OpCode.FNegate; args = [ResultType; ResultId; Arg("value", typeof<int>) ] }
 
+        { opCode = OpCode.IAdd; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.FAdd; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.ISub; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.FSub; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.IMul; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.FMul; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.UDiv; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.SDiv; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.FDiv; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.UMod; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.SRem; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.SMod; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.FRem; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.FMod; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.VectorTimesScalar; args = [ResultType; ResultId; Arg("v", typeof<int>); Arg("s", typeof<int>) ] }
+        { opCode = OpCode.MatrixTimesScalar; args = [ResultType; ResultId; Arg("m", typeof<int>); Arg("s", typeof<int>) ] }
+        { opCode = OpCode.VectorTimesMatrix; args = [ResultType; ResultId; Arg("v", typeof<int>); Arg("m", typeof<int>) ] }
+        { opCode = OpCode.MatrixTimesVector; args = [ResultType; ResultId; Arg("m", typeof<int>); Arg("v", typeof<int>) ] }
+        { opCode = OpCode.MatrixTimesMatrix; args = [ResultType; ResultId; Arg("m0", typeof<int>); Arg("m1", typeof<int>) ] }
+        { opCode = OpCode.OuterProduct; args = [ResultType; ResultId; Arg("v0", typeof<int>); Arg("v1", typeof<int>) ] }
+        { opCode = OpCode.Dot; args = [ResultType; ResultId; Arg("v0", typeof<int>); Arg("v1", typeof<int>) ] }
+        { opCode = OpCode.IAddCarry; args = [ResultType; ResultId] }
+        { opCode = OpCode.ISubBorrow; args = [ResultType; ResultId] }
+        { opCode = OpCode.IMulExtended; args = [ResultType; ResultId] }
 
         // Bit instructions
-
+        { opCode = OpCode.ShiftRightLogical; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.ShiftRightArithmetic; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.ShiftLeftLogical; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.BitwiseOr; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.BitwiseXor; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.BitwiseAnd; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.Not; args = [ResultType; ResultId; Arg("v", typeof<int>) ] }
+        { opCode = OpCode.BitFieldInsert; args = [ResultType; ResultId; Arg("_base", typeof<int>); Arg("insert", typeof<int>); Arg("offset", typeof<int>); Arg("count", typeof<int>) ] }
+        { opCode = OpCode.BitFieldSExtract; args = [ResultType; ResultId; Arg("_base", typeof<int>); Arg("offset", typeof<int>); Arg("count", typeof<int>) ] }
+        { opCode = OpCode.BitFieldUExtract; args = [ResultType; ResultId; Arg("_base", typeof<int>); Arg("offset", typeof<int>); Arg("count", typeof<int>) ] }
+        { opCode = OpCode.BitReverse; args = [ResultType; ResultId; Arg("_base", typeof<int>) ] }
+        { opCode = OpCode.BitCount; args = [ResultType; ResultId; Arg("_base", typeof<int>) ] }
 
         // Relations and Logics
+        { opCode = OpCode.Any; args = [ResultType; ResultId; Arg("vec", typeof<int>) ] }
+        { opCode = OpCode.All; args = [ResultType; ResultId; Arg("vec", typeof<int>) ] }
+        { opCode = OpCode.IsNan; args = [ResultType; ResultId; Arg("v", typeof<int>) ] }
+        { opCode = OpCode.IsInf; args = [ResultType; ResultId; Arg("v", typeof<int>) ] }
+        { opCode = OpCode.IsFinite; args = [ResultType; ResultId; Arg("v", typeof<int>) ] }
+        { opCode = OpCode.IsNormal; args = [ResultType; ResultId; Arg("v", typeof<int>) ] }
+        { opCode = OpCode.SignBitSet; args = [ResultType; ResultId; Arg("v", typeof<int>) ] }
+        { opCode = OpCode.LessOrGreater; args = [ResultType; ResultId; Arg("x", typeof<int>); Arg("y", typeof<int>) ] }
+        { opCode = OpCode.Ordered; args = [ResultType; ResultId; Arg("x", typeof<int>); Arg("y", typeof<int>) ] }
+        { opCode = OpCode.Unordered; args = [ResultType; ResultId; Arg("x", typeof<int>); Arg("y", typeof<int>) ] }
+        { opCode = OpCode.LogicalEqual; args = [ResultType; ResultId; Arg("x", typeof<int>); Arg("y", typeof<int>) ] }
+        { opCode = OpCode.LogicalNotEqual; args = [ResultType; ResultId; Arg("x", typeof<int>); Arg("y", typeof<int>) ] }
+        { opCode = OpCode.LogicalOr; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.LogicalAnd; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.LogicalNot; args = [ResultType; ResultId; Arg("v", typeof<int>) ] }
+        { opCode = OpCode.Select; args = [ResultType; ResultId; Arg("guard", typeof<int>); Arg("vtrue", typeof<int>); Arg("vfalse", typeof<int>) ] }
+        { opCode = OpCode.IEqual; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.INotEqual; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.UGreaterThan; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.SGreaterThan; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.UGreaterThanEqual; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.SGreaterThanEqual; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.ULessThan; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.SLessThan; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.ULessThanEqual; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.SLessThanEqual; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.FOrdEqual; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.FUnordEqual; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.FOrdNotEqual; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.FUnordNotEqual; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.FOrdLessThan; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.FUnordLessThan; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.FOrdGreaterThan; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.FUnordGreaterThan; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.FOrdLessThanEqual; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.FUnordLessThanEqual; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.FOrdGreaterThanEqual; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
+        { opCode = OpCode.FUnordGreaterThanEqual; args = [ResultType; ResultId; Arg("l", typeof<int>); Arg("r", typeof<int>) ] }
 
 
         // Derivative instruction
-
+        { opCode = OpCode.DPdx; args = [ResultType; ResultId; Arg("p", typeof<int>) ] }
+        { opCode = OpCode.DPdy; args = [ResultType; ResultId; Arg("p", typeof<int>) ] }
+        { opCode = OpCode.Fwidth; args = [ResultType; ResultId; Arg("p", typeof<int>) ] }
+        { opCode = OpCode.DPdxFine; args = [ResultType; ResultId; Arg("p", typeof<int>) ] }
+        { opCode = OpCode.DPdyFine; args = [ResultType; ResultId; Arg("p", typeof<int>) ] }
+        { opCode = OpCode.FwidthFine; args = [ResultType; ResultId; Arg("p", typeof<int>) ] }
+        { opCode = OpCode.DPdxCoarse; args = [ResultType; ResultId; Arg("p", typeof<int>) ] }
+        { opCode = OpCode.DPdyCoarse; args = [ResultType; ResultId; Arg("p", typeof<int>) ] }
+        { opCode = OpCode.FwidthCoarse; args = [ResultType; ResultId; Arg("p", typeof<int>) ] }
 
         // Control Flow
-
+        { opCode = OpCode.Phi; args = [ResultType; ResultId; Arg("variableParentPairs", typeof<int[]>) ] }
+        { opCode = OpCode.LoopMerge; args = [Arg("mergeBlock", typeof<int>); Arg("ctrl", typeof<LoopControl>) ] }
+        { opCode = OpCode.SelectionMerge; args = [Arg("mergeBlock", typeof<int>); Arg("ctrl", typeof<SelectionControl>) ] }
+        { opCode = OpCode.Label; args = [ResultId] }
+        { opCode = OpCode.Branch; args = [Arg("target", typeof<int>)] }
+        { opCode = OpCode.BranchConditional; args = [Arg("condition", typeof<int>); Arg("trueLabel", typeof<int>); Arg("falseLabel", typeof<int>); Arg("branchWeights", typeof<int[]>)] }
+        { opCode = OpCode.Switch; args = [Arg("selector", typeof<int>); Arg("_default", typeof<int>); Arg("literalLabelPairs", typeof<int[]>)] }
+        { opCode = OpCode.Kill; args = [] }
+        { opCode = OpCode.Return; args = [] }
+        { opCode = OpCode.ReturnValue; args = [Arg("value", typeof<int>)] }
+        { opCode = OpCode.Unreachable; args = [] }
+        { opCode = OpCode.LifetimeStart; args = [Arg("ptr", typeof<int>); Arg("size", typeof<int>)] }
+        { opCode = OpCode.LifetimeStop; args = [Arg("ptr", typeof<int>); Arg("size", typeof<int>)] }
 
         // Atomics
 

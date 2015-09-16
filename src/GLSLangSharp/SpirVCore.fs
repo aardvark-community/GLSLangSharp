@@ -513,8 +513,13 @@ type FunctionControl =
     | PureMask = 0x00000004u
     | ConstMask = 0x00000008u
 
+type LoopControl =
+    | UnrollShift = 0u
+    | DontUnrollShift = 1u
 
-
+type SelectionControl =
+    | FlattenShift = 0u
+    | DontFlattenShift = 1u
 
 type RawOperands (data : byte[]) =
     member x.AsString = 
