@@ -1,8 +1,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.22823.1
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "GLSLang", "GLSLang\GLSLang.fsproj", "{33e987bb-93ab-41ab-b44f-1b7bdef61425}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "GLSLangSharp", "GLSLangSharp\GLSLangSharp.fsproj", "{33E987BB-93AB-41AB-B44F-1B7BDEF61425}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -10,10 +10,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{33e987bb-93ab-41ab-b44f-1b7bdef61425}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{33e987bb-93ab-41ab-b44f-1b7bdef61425}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{33e987bb-93ab-41ab-b44f-1b7bdef61425}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{33e987bb-93ab-41ab-b44f-1b7bdef61425}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33E987BB-93AB-41AB-B44F-1B7BDEF61425}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33E987BB-93AB-41AB-B44F-1B7BDEF61425}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33E987BB-93AB-41AB-B44F-1B7BDEF61425}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33E987BB-93AB-41AB-B44F-1B7BDEF61425}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
