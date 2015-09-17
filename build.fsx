@@ -187,32 +187,32 @@ let deploy (url : string) (keyName : Option<string>) =
 
     let branch = Fake.Git.Information.getBranchName "."
     let releaseNotes = Fake.Git.Information.getCurrentHash()
-    if branch <> "master" then
-        tracefn "are you really sure you want do deploy a non-master branch? (Y/N)"
-        let l = Console.ReadLine().Trim().ToLower()
-        if l = "y"
-        then
-            let tag = Fake.Git.Information.getLastTag()
-            match accessKey with
-                | Some accessKey ->
-                    try
-                        for id in myPackages do
-                            let packageName = sprintf "bin/%s.%s.nupkg" id tag
-                            tracefn "pushing: %s" packageName
-                            Paket.Dependencies.Push(packageName, apiKey = accessKey, url = url)
-                    with e ->
-                        traceError (string e)
-                | None ->
-                    traceError (sprintf "Could not find nuget access key")
-         else 
-            traceError (sprintf "cannot deploy branch: %A" branch)
+    let dep =
+        if branch <> "master" then
+            tracefn "are you really sure you want do deploy a non-master branch? (Y/N)"
+            let l = Console.ReadLine().Trim().ToLower()
+            l = "y"
+        else true
+
+    if dep then
+        let tag = Fake.Git.Information.getLastTag()
+        match accessKey with
+            | Some accessKey ->
+                try
+                    for id in myPackages do
+                        let packageName = sprintf "bin/%s.%s.nupkg" id tag
+                        tracefn "pushing: %s" packageName
+                        Paket.Dependencies.Push(packageName, apiKey = accessKey, url = url)
+                with e ->
+                    traceError (string e)
+            | None ->
+                traceError (sprintf "Could not find nuget access key")
 
 Target "MyGetDeploy" (fun () -> 
-    deploy "https://vrvis.myget.org/F/aardvark/api/v2" (Some "myget.key") 
+    deploy "https://vrvis.myget.org/F/aardvark/api/v2/" (Some "myget.key") 
 )
 
 "CreatePackage" ==> "MyGetDeploy"
-"Compile" ==> "CreatePackage"
 "Compile" ==> "InjectNativeDependencies" ==> "CreatePackage"
 "CreatePackage" ==> "Push"
 
