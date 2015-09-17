@@ -10,20 +10,14 @@
 
 #load @"bin/addSources.fsx"
 
-
 open Fake
 open System
 open System.IO
 open Aardvark.Build
-open System.Diagnostics
 open System.Text.RegularExpressions
-
 open AdditionalSources
- 
 do Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
-
 let packageNameRx = Regex @"(?<name>[a-zA-Z_0-9\.]+?)\.(?<version>([0-9]+\.)*[0-9]+)\.nupkg"
-let core = ["src/GLSLang.sln"];
 
 Target "Install" (fun () ->
     AdditionalSources.paketDependencies.Install(false, false, false, true)
@@ -31,11 +25,7 @@ Target "Install" (fun () ->
 )
 
 Target "Restore" (fun () ->
-    if File.Exists "paket.lock" then
-        AdditionalSources.paketDependencies.Restore()
-    else
-        AdditionalSources.paketDependencies.Install(false, false, false, true)
-        
+    AdditionalSources.paketDependencies.Restore()
     AdditionalSources.installSources ()
 )
 
@@ -72,10 +62,20 @@ Target "Clean" (fun () ->
     DeleteDir (Path.Combine("bin", "Debug"))
 )
 
+
+
 Target "Compile" (fun () ->
-    MSBuildRelease "bin/Release" "Build" core |> ignore
+    MSBuildRelease "bin/Release" "Build" ["src/GLSLang.sln"] |> ignore
 )
 
+
+
+Target "Default" (fun () -> ())
+
+
+"Restore" ==> 
+    "Compile" ==>
+    "Default"
 
 
 Target "CreatePackage" (fun () ->
@@ -93,42 +93,43 @@ Target "CreatePackage" (fun () ->
     AdditionalSources.paketDependencies.Pack("bin", version = tag, releaseNotes = releaseNotes)
 )
 
-
 Target "InjectNativeDependencies" (fun () ->
-    if Directory.Exists "libs/Native" then
-        if Directory.Exists "bin/Debug" then
-            File.Copy(@"packages/Aardvark.Build/lib/net45/Aardvark.Build.dll", @"bin/Debug/Aardvark.Build.dll", true)
-        if Directory.Exists "bin/Release" then
-            File.Copy(@"packages/Aardvark.Build/lib/net45/Aardvark.Build.dll", @"bin/Release/Aardvark.Build.dll", true)
 
-        let dirs = Directory.GetDirectories "libs/Native"
-        for d in dirs do
-            let n = Path.GetFileName d
-            let d = d |> Path.GetFullPath
-            let paths = [
-                Path.Combine("bin/Release", n + ".dll") |> Path.GetFullPath
-                Path.Combine("bin/Release", n + ".exe") |> Path.GetFullPath
-                Path.Combine("bin/Debug", n + ".dll") |> Path.GetFullPath
-                Path.Combine("bin/Debug", n + ".exe") |> Path.GetFullPath
-            ]
+    if Directory.Exists "bin/Debug" then
+        File.Copy(@"packages/Aardvark.Build/lib/net45/Aardvark.Build.dll", @"bin/Debug/Aardvark.Build.dll", true)
+    if Directory.Exists "bin/Release" then
+        File.Copy(@"packages/Aardvark.Build/lib/net45/Aardvark.Build.dll", @"bin/Release/Aardvark.Build.dll", true)
 
-            let wd = Environment.CurrentDirectory
-            try
+    let dirs = Directory.GetDirectories "libs/Native"
+    for d in dirs do
+        let n = Path.GetFileName d
+        let d = d |> Path.GetFullPath
+        let paths = [
+            Path.Combine("bin/Release", n + ".dll") |> Path.GetFullPath
+            Path.Combine("bin/Release", n + ".exe") |> Path.GetFullPath
+            Path.Combine("bin/Debug", n + ".dll") |> Path.GetFullPath
+            Path.Combine("bin/Debug", n + ".exe") |> Path.GetFullPath
+        ]
+
+        let wd = Environment.CurrentDirectory
+        try
         
-                for p in paths do
-                    if File.Exists p then
-                        Environment.CurrentDirectory <- Path.GetDirectoryName p
-                        let ass = Mono.Cecil.AssemblyDefinition.ReadAssembly(p)
-                        AssemblyInjector.addResources d ass
-                        ass.Write p
-                        tracefn "injected native stuff in %A" p
-            finally
-                Environment.CurrentDirectory <- wd
-
-            ()
+            for p in paths do
+                if File.Exists p then
+                    Environment.CurrentDirectory <- Path.GetDirectoryName p
+                    let ass = Mono.Cecil.AssemblyDefinition.ReadAssembly(p)
+                    AssemblyInjector.addResources d ass
+                    ass.Write p
+                    tracefn "injected native stuff in %A" p
+        finally
+            Environment.CurrentDirectory <- wd
 
         ()
+
+    ()
 )
+
+
 
 Target "Push" (fun () ->
     let packages = !!"bin/*.nupkg"
@@ -155,11 +156,10 @@ Target "Push" (fun () ->
         traceError (string e)
 )
 
-
-Target "Deploy" (fun () ->
+let deploy (url : string) (keyName : Option<string>) =
 
     let packages = !!"bin/*.nupkg"
-    
+    let packageNameRx = Regex @"(?<name>[a-zA-Z_0-9\.]+?)\.(?<version>([0-9]+\.)*[0-9]+)\.nupkg"
 
     let myPackages = 
         packages 
@@ -172,40 +172,50 @@ Target "Deploy" (fun () ->
             )
             |> Set.ofSeq
 
-    let accessKeyPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".ssh", "nuget.key")
+   
     let accessKey =
-        if File.Exists accessKeyPath then Some (File.ReadAllText accessKeyPath)
-        else None
+        match keyName with
+         | Some keyName -> 
+            let accessKeyPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".ssh", keyName)
+            if File.Exists accessKeyPath then 
+                let r = Some (File.ReadAllText accessKeyPath)
+                tracefn "key: %A" r.Value
+                r
+            else None
+         | None -> None
+
 
     let branch = Fake.Git.Information.getBranchName "."
     let releaseNotes = Fake.Git.Information.getCurrentHash()
-    if branch = "master" then
-        let tag = Fake.Git.Information.getLastTag()
-        match accessKey with
-            | Some accessKey ->
-                try
-                    for id in myPackages do
-                        Paket.Dependencies.Push(sprintf "bin/%s.%s.nupkg" id tag, apiKey = accessKey)
-                with e ->
-                    traceError (string e)
-            | None ->
-                traceError (sprintf "Could not find nuget access key")
-     else 
-        traceError (sprintf "cannot deploy branch: %A" branch)
+    if branch <> "master" then
+        tracefn "are you really sure you want do deploy a non-master branch? (Y/N)"
+        let l = Console.ReadLine().Trim().ToLower()
+        if l = "y"
+        then
+            let tag = Fake.Git.Information.getLastTag()
+            match accessKey with
+                | Some accessKey ->
+                    try
+                        for id in myPackages do
+                            let packageName = sprintf "bin/%s.%s.nupkg" id tag
+                            tracefn "pushing: %s" packageName
+                            Paket.Dependencies.Push(packageName, apiKey = accessKey, url = url)
+                    with e ->
+                        traceError (string e)
+                | None ->
+                    traceError (sprintf "Could not find nuget access key")
+         else 
+            traceError (sprintf "cannot deploy branch: %A" branch)
+
+Target "MyGetDeploy" (fun () -> 
+    deploy "https://vrvis.myget.org/F/aardvark/api/v2" (Some "myget.key") 
 )
 
-
-Target "Default" (fun () -> ())
-
+"CreatePackage" ==> "MyGetDeploy"
+"Compile" ==> "CreatePackage"
 "Compile" ==> "InjectNativeDependencies" ==> "CreatePackage"
-"CreatePackage" ==> "Deploy"
 "CreatePackage" ==> "Push"
 
-
-"Restore" ==> 
-    "Compile" ==>
-    "InjectNativeDependencies" ==>
-    "Default"
-    
 // start build
 RunTargetOrDefault "Default"
+
