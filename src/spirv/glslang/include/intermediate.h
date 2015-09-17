@@ -896,12 +896,7 @@ public:
 
     int getMaxDepth() const { return maxDepth; }
 
-    void incrementDepth(TIntermNode *current)
-    {
-        depth++;
-        maxDepth = max(maxDepth, depth);
-        path.push_back(current);
-    }
+    void incrementDepth(TIntermNode *current);
 
     void decrementDepth()
     {
