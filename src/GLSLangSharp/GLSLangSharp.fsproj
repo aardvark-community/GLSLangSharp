@@ -461,6 +461,7 @@
     <Compile Include="GLSLang.fs" />
     <Compile Include="SpirVCore.fs" />
     <Compile Include="SpirVInstructions.fs" />
+    <Compile Include="SpirVReflection.fs" />
     <Compile Include="SpirV.fs" />
   </ItemGroup>
   <ItemGroup>

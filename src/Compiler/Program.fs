@@ -7,7 +7,7 @@ open GLSLang.SpirV
 let code = """#version 140
 #extension GL_ARB_separate_shader_objects : enable
 #extension GL_ARB_shading_language_420pack : enable
-layout(binding = 0) uniform buf {
+layout( binding = 0) uniform buf {
         mat4 MVP;
         vec4 position[12*3];
         vec4 attr[12*3];
@@ -31,6 +31,8 @@ void main()
 [<EntryPoint>]
 let main argv = 
 
+    let strBuilder = System.Text.StringBuilder()
+    //let printfn fmt = Printf.kprintf (fun s -> strBuilder.AppendLine s |> ignore) fmt
 
     match GLSLang.tryCompileSpirVBinary ShaderStage.Vertex code with
         | Success theirs ->
@@ -41,6 +43,11 @@ let main argv =
                     | Some id -> printfn "%d:\t%A" id i
                     | None -> printfn "   \t%A" i
 
+            
+            let iface = SpirVReflection.getInterface instructions
+
+            printfn "%A" iface
+
             let mine = SpirV.assemble instructions
 
  
@@ -48,7 +55,9 @@ let main argv =
             let equal = equalLength && Array.forall2 (=) theirs mine
             printfn "length: %A equal: %A" equalLength equal
 
-            System.IO.File.WriteAllBytes(@"C:\Users\schorsch\Desktop\test.spv", theirs)
+            System.IO.File.WriteAllBytes(@"C:\Users\steinlechner\Desktop\test.spv", theirs)
+
+            //System.IO.File.WriteAllText(@"C:\Users\steinlechner\Desktop\test.txt",strBuilder.ToString())
         | Error e ->
             printfn "%s" e
 

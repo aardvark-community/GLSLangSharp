@@ -29,7 +29,7 @@ type Instruction =
     | TypeFloat of resId : uint32 * width : uint32
     | TypeVector of resId : uint32 * compType : uint32 * compCount : uint32
     | TypeMatrix of resId : uint32 * colType : uint32 * colCount : uint32
-    | TypeImage of resId : uint32 * sampledType : uint32 * dim : uint32 * depth : uint32 * arrayed : bool * ms : bool * sampled : SampleMode * format : ImageFormat * access : uint32[]
+    | TypeImage of resId : uint32 * sampledType : uint32 * dim : uint32 * depth : bool * arrayed : bool * ms : bool * sampled : SampleMode * format : ImageFormat * access : uint32[]
     | TypeSampler of resId : uint32
     | TypeSampledImage of resId : uint32 * imageType : uint32
     | TypeArray of resId : uint32 * elemType : uint32 * length : uint32
@@ -267,7 +267,7 @@ module private SpirVUtilities =
             | OpCode.TypeFloat -> TypeFloat(args.UInt32 0, args.UInt32 1)
             | OpCode.TypeVector -> TypeVector(args.UInt32 0, args.UInt32 1, args.UInt32 2)
             | OpCode.TypeMatrix -> TypeMatrix(args.UInt32 0, args.UInt32 1, args.UInt32 2)
-            | OpCode.TypeImage -> TypeImage(args.UInt32 0, args.UInt32 1, args.UInt32 2, args.UInt32 3, args.UInt32 4 = 1u, args.UInt32 5 = 1u, args.UInt32 6 |> unbox<SampleMode>, args.UInt32 7 |> unbox<ImageFormat>, args.UInt32Array 8)
+            | OpCode.TypeImage -> TypeImage(args.UInt32 0, args.UInt32 1, args.UInt32 2, args.UInt32 3 = 1u, args.UInt32 4 = 1u, args.UInt32 5 = 1u, args.UInt32 6 |> unbox<SampleMode>, args.UInt32 7 |> unbox<ImageFormat>, args.UInt32Array 8)
             | OpCode.TypeSampler -> TypeSampler(args.UInt32 0)
             | OpCode.TypeSampledImage -> TypeSampledImage(args.UInt32 0, args.UInt32 1)
             | OpCode.TypeArray -> TypeArray(args.UInt32 0, args.UInt32 1, args.UInt32 2)
