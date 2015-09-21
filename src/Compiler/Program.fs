@@ -13,13 +13,17 @@ layout( binding = 0) uniform buf {
         vec4 attr[12*3];
 } ubuf;
 
+layout (binding = 1, set = 0) uniform _sepp { 
+    vec4 test;
+} sepp;
+
 layout(location = 0) in vec4 myPos;
 
 layout (location = 0) out vec4 texcoord;
 void main() 
 {
     texcoord = ubuf.attr[gl_VertexID];
-    gl_Position = ubuf.MVP * ubuf.position[gl_VertexID] + myPos;
+    gl_Position = ubuf.MVP * ubuf.position[gl_VertexID] + myPos - sepp.test;
 
     // GL->VK conventions
     gl_Position.y = -gl_Position.y;
@@ -55,7 +59,7 @@ let main argv =
             let equal = equalLength && Array.forall2 (=) theirs mine
             printfn "length: %A equal: %A" equalLength equal
 
-            System.IO.File.WriteAllBytes(@"C:\Users\steinlechner\Desktop\test.spv", theirs)
+            //System.IO.File.WriteAllBytes(@"C:\Users\steinlechner\Desktop\test.spv", theirs)
 
             //System.IO.File.WriteAllText(@"C:\Users\steinlechner\Desktop\test.txt",strBuilder.ToString())
         | Error e ->

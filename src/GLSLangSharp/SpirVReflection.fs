@@ -40,6 +40,12 @@ module Parameter =
                 | _ -> None
         ) 
 
+    let tryGetDescriptorSet (p : Parameter) =
+       p.paramDecorations |> List.tryPick (fun (d,args) ->
+            match d with
+                | Decoration.DescriptorSet -> Some (args.[0] |> int)
+                | _ -> None
+        ) 
 
     let tryGetBuiltInSemantic (p : Parameter) =
         p.paramDecorations |> List.tryPick (fun (d,args) ->
