@@ -210,6 +210,7 @@ module SpirVReflection =
                         match kind with
                             | StorageClass.Input 
                             | StorageClass.Uniform 
+                            | StorageClass.UniformConstant
                             | StorageClass.Image 
                             | StorageClass.Output ->
                                 Some (typeId, target, kind)
@@ -263,6 +264,8 @@ module SpirVReflection =
                     | TypeImage(resId,sampledType,dim,depth, arrayed, ms, sampled,format,access) ->
                         let! sampledType = typeForId sampledType
                         return Image(sampledType, unbox<Dim> dim, depth,arrayed,ms)
+                    | TypeSampledImage(resId, imageType) ->
+                        return! typeForId imageType
                     | TypeSampler(_) -> return Sampler
                     | TypeArray(_,elem,len) -> 
                         let! elem = typeForId elem
@@ -322,6 +325,13 @@ module SpirVReflection =
                         | _ -> None
                    )
 
+        let images =
+            parameters 
+                |> List.choose (fun (ci, n, t, d) ->
+                    match ci, t with
+                        | (StorageClass.UniformConstant | StorageClass.Uniform), Ptr(Image _) -> Some { paramName = n; paramType = t; paramDecorations = d }
+                        | _ -> None
+                   )
 
         let ioSort (p : Parameter) =
             match Parameter.tryGetLocation p with
@@ -345,6 +355,5 @@ module SpirVReflection =
         let inputs = extractParamteters StorageClass.Input |> List.sortBy ioSort
         let outputs = extractParamteters StorageClass.Output |> List.sortBy ioSort
         let uniforms = extractParamteters StorageClass.Uniform |> List.sortBy uniformSort
-        let images = extractParamteters StorageClass.Image |> List.sortBy uniformSort
 
         { executionModel = execModel; entryPoint = entryPoint ;inputs = inputs; outputs = outputs; uniforms = uniforms; images = images }
