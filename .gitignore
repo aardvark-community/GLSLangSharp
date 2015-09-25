@@ -16,3 +16,4 @@ x64
 /src/spirv/*.sdf
 /src/spirv/spirv/*.user
 /src/spirv/*.opensdf
+/bin/Aardvark.Fake.dll

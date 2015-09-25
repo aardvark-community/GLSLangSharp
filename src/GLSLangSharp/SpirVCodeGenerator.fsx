@@ -58,7 +58,7 @@ let prototypes =
         { opCode = OpCode.TypeFloat; args = [ResultId; Arg("width", typeof<int>)] }
         { opCode = OpCode.TypeVector; args = [ResultId; Arg("compType", typeof<int>); Arg("compCount", typeof<int>)] }
         { opCode = OpCode.TypeMatrix; args = [ResultId; Arg("colType", typeof<int>); Arg("colCount", typeof<int>)] }
-        { opCode = OpCode.TypeImage; args = [ResultId; Arg("sampledType", typeof<int>); Arg("dim", typeof<int>); Arg("depth", typeof<int>); Arg("arrayed", typeof<bool>); Arg("ms", typeof<bool>); Arg("sampled", typeof<SampleMode>); Arg("format", typeof<ImageFormat>); Arg("access", typeof<int[]>)] }
+        { opCode = OpCode.TypeImage; args = [ResultId; Arg("sampledType", typeof<int>); Arg("dim", typeof<int>); Arg("depth", typeof<bool>); Arg("arrayed", typeof<bool>); Arg("ms", typeof<bool>); Arg("sampled", typeof<SampleMode>); Arg("format", typeof<ImageFormat>); Arg("access", typeof<int[]>)] }
         { opCode = OpCode.TypeSampler; args = [ResultId] }
         { opCode = OpCode.TypeSampledImage; args = [ResultId; Arg("imageType", typeof<int>)] }
         { opCode = OpCode.TypeArray; args = [ResultId; Arg("elemType", typeof<int>); Arg("length", typeof<int>)] }
