@@ -243,7 +243,7 @@ type Program = nativeint
 module GLSLang =
     
     [<Literal>]
-    let lib = "spirv"
+    let lib = "GLSLangNative"
 
 
     [<DllImport(lib)>]
