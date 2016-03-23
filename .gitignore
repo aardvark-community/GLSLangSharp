@@ -19,3 +19,6 @@ x64
 /bin/Aardvark.Fake.dll
 /src/spirv/.vs/GLSLangNative/v14/*.suo
 /src/spirv/GLSLangNative/GLSLangNative.user
+/.paket/paket.exe
+/paket-files
+/.fake
