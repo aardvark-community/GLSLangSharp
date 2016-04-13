@@ -3,7 +3,7 @@
 
 deploy: libspirv.so
 	mkdir -p ../../libs/Native/GLSLangSharp/linux/AMD64
-	cp libspirv.so ../../libs/Native/GLSLangSharp/linux/AMD64/libspirv.so
+	cp libspirv.so ../../libs/Native/GLSLangSharp/linux/AMD64/libGLSLangNative.so
 
 libspirv.so: spirv.o
 	g++ spirv.o -L glslang/lib -shared -lSPIRV -lglslang -lOGLCompiler -lOSDependent -lHLSL -lpthread -o libspirv.so
