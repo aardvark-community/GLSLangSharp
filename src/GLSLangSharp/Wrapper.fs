@@ -1,5 +1,6 @@
 ﻿namespace GLSLang.Raw
 
+open Aardvark.Base
 open System.Runtime.InteropServices
 open Microsoft.FSharp.NativeInterop
 
@@ -330,7 +331,11 @@ module GLSLang =
 
         if ptr = 0n then null
         else
-            let data : byte[] = Array.zeroCreate (int size)
-            try Marshal.Copy(ptr, data, 0, data.Length)
-            finally ShFreeSpirV(ptr, size)
+            let data : uint32[] = Array.zeroCreate (int (size / 4UL))
+            let gc = GCHandle.Alloc(data, GCHandleType.Pinned)
+            try 
+                Marshal.Copy(ptr, gc.AddrOfPinnedObject(), size)
+            finally 
+                gc.Free()
+                ShFreeSpirV(ptr, size)
             data

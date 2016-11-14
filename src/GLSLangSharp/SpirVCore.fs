@@ -675,11 +675,20 @@ module private DefinesAndExtensions =
         member x.Remaining =
             x.Length - x.Position
 
+exception SpirVException of string
+
+[<AutoOpen>]
+module private Utilities =
+    let inline fail str = raise <| SpirVException("[SpirV] " + str)
+    let inline failf fmt = Printf.kprintf fail fmt
+
+
+
 module private RawReader =
 
     let readInstruction(data : Stream) =
         if data.Remaining < 1L then
-            failwithf "[SpirV] not enough data"
+            fail "not enough data"
         else
             let num = data.Remaining
 
@@ -688,9 +697,9 @@ module private RawReader =
             let opCode = read &&& 0xFFFFu |> uint16 |> unbox<OpCode>
 
             if wordCount < 1us then
-                failwithf "[SpirV] malformed instruction: %A" wordCount
+                failf "malformed instruction: %A" wordCount
             elif int64 wordCount > num then
-                failwithf "[SpirV] not enough data: %A > %A" wordCount num
+                failf "not enough data: %A > %A" wordCount num
             else
                 let args = Array.zeroCreate ( 4 * (int wordCount - 1) )
                 let mutable read = 0
@@ -701,7 +710,7 @@ module private RawReader =
 
     let read(data : Stream) =
         if data.Length < 5L then
-            failwith "[SpirV] not enough data"
+            fail "not enough data"
 
         let magic = data.ReadUInt32()
         let version = data.ReadUInt32()
@@ -709,9 +718,9 @@ module private RawReader =
         let bound = data.ReadUInt32()
         let reserved = data.ReadUInt32()
 
+        if magic <> SV_MAGIC then
+            failf "invalid SpirV magic 0x%08X" magic
 
-        if magic <> SV_MAGIC || version <> 99u then
-            failwith "[SpirV] invalid SpirV magic or version"
 
         let instructions =
             [
@@ -728,17 +737,15 @@ module private RawWriter =
     type Stream with
         member x.WriteUInt32(u : uint32) =
             x.Write(BitConverter.GetBytes(u), 0, sizeof<uint32>)
-            
 
-    let write (s : Stream) (instructions : list<RawInstruction>) (maxId : uint32) =
-        s.WriteUInt32(SV_MAGIC)
-        s.WriteUInt32(99u)
-        s.WriteUInt32(0x051A00BBu)
-        s.WriteUInt32(maxId + 1u)
-        s.WriteUInt32(0u)
+    let write (s : Stream) (m : RawModule) =
+        s.WriteUInt32(m.magic)
+        s.WriteUInt32(m.version)
+        s.WriteUInt32(m.generator)
+        s.WriteUInt32(m.bound)
+        s.WriteUInt32(m.reserved)
 
-
-        for i in instructions do
+        for i in m.instructions do
             let wordCount = uint16(i.operands.Length / 4) + 1us
             let opCode = i.opCode |> uint16
 

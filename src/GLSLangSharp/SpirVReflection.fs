@@ -201,10 +201,10 @@ module SpirVReflection =
                 map
     
 
-    let getInterface (instructions : list<Instruction>) = 
+    let getInterface (m : Module) = 
 
         let inputVariables = 
-            instructions |> List.choose (fun i -> 
+            m.instructions |> List.choose (fun i -> 
                 match i with
                     | Variable(typeId,target, kind, _) ->
                         match kind with
@@ -219,14 +219,14 @@ module SpirVReflection =
             )
 
         let names = 
-            instructions |> List.choose (fun i ->
+            m.instructions |> List.choose (fun i ->
                 match i with
                     | Name(target,name) -> Some (target,name)
                     | _ -> None
             ) |> Map.ofList
 
         let memberNames = 
-            instructions |> List.choose (fun i ->
+            m.instructions |> List.choose (fun i ->
                 match i with
                     | MemberName(target, index, name) -> 
                         Some ((target,index), name)
@@ -234,15 +234,15 @@ module SpirVReflection =
             ) |> Map.ofList
 
         let memberDecorations =   
-            instructions |> List.choose (fun i ->
+            m.instructions |> List.choose (fun i ->
                 match i with
                     | MemberDecorate(target, index,dec,args) -> Some ((target, index),(dec,args))
                     | _ -> None
             ) |> Map.ofListWithDuplicates
 
         let map = 
-             instructions |> List.choose (fun i ->
-                    match SpirVUtilities.tryGetId i with
+             m.instructions |> List.choose (fun i ->
+                    match Instruction.tryGetId i with
                         | Some id -> Some (id,i)
                         | None -> None
                 ) |> Map.ofList
@@ -299,7 +299,7 @@ module SpirVReflection =
             }
 
         let decorations =   
-            instructions |> List.choose (fun i ->
+            m.instructions |> List.choose (fun i ->
                 match i with
                     | Decorate(target,dec,args) -> Some (target,(dec,args))
                     | _ -> None
@@ -351,7 +351,7 @@ module SpirVReflection =
 
             (set, binding, p.paramName)
         
-        let (execModel, entryPoint) = instructions |> List.pick (function EntryPoint(m,_,name) -> Some (m,name) | _ -> None)
+        let (execModel, entryPoint) = m.instructions |> List.pick (function EntryPoint(m,_,name) -> Some (m,name) | _ -> None)
         let inputs = extractParamteters StorageClass.Input |> List.sortBy ioSort
         let outputs = extractParamteters StorageClass.Output |> List.sortBy ioSort
         let uniforms = extractParamteters StorageClass.Uniform |> List.sortBy uniformSort

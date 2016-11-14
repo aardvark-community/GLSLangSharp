@@ -40,19 +40,19 @@ let main argv =
 
     match GLSLang.tryCompileSpirVBinary ShaderStage.Vertex code with
         | Success theirs ->
-            let instructions = SpirV.disassemble theirs
+            let m = Module.ofArray theirs
 
-            for i in instructions do
-                match SpirV.tryGetResultId i with
+            for i in m.instructions do
+                match Instruction.tryGetId i with
                     | Some id -> printfn "%d:\t%A" id i
                     | None -> printfn "   \t%A" i
 
             
-            let iface = SpirVReflection.getInterface instructions
+            let iface = SpirVReflection.getInterface m
 
             printfn "%A" iface
 
-            let mine = SpirV.assemble instructions
+            let mine = Module.toArray m
 
  
             let equalLength = theirs.Length = mine.Length
