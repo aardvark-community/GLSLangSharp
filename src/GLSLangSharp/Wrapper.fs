@@ -1,5 +1,6 @@
 ﻿namespace GLSLang.Raw
 
+open System.Security
 open Aardvark.Base
 open System.Runtime.InteropServices
 open Microsoft.FSharp.NativeInterop
@@ -248,34 +249,34 @@ module GLSLang =
     let lib = "GLSLangNative"
 
 
-    [<DllImport(lib)>]
+    [<DllImport(lib); SuppressUnmanagedCodeSecurity>]
     extern bool ShInitializeProcess()
 
-    [<DllImport(lib)>]
+    [<DllImport(lib); SuppressUnmanagedCodeSecurity>]
     extern void ShFinalizeProcess()
 
 
 
-    [<DllImport(lib)>]
+    [<DllImport(lib); SuppressUnmanagedCodeSecurity>]
     extern Shader ShCreateShader(ShLanguage language)
 
-    [<DllImport(lib)>]
+    [<DllImport(lib); SuppressUnmanagedCodeSecurity>]
     extern void ShDestroyShader(Shader shader)
 
-    [<DllImport(lib, EntryPoint = "ShSetShaderSource")>]
+    [<DllImport(lib, EntryPoint = "ShSetShaderSource"); SuppressUnmanagedCodeSecurity>]
     extern bool ShSetShaderSource(Shader shader, nativeint shaderStrings, nativeint shaderStringLength, int numSources)
 
     [<DllImport(lib)>]
     extern bool ShParseShader(Shader shader, TBuiltInResource* resources, int defaultVersion, ShProfile defaultProfile, int forceDefault, int forwardCompatible, ShMessages messages)
 
-    [<DllImport(lib, EntryPoint = "ShGetShaderInfoLog")>]
+    [<DllImport(lib, EntryPoint = "ShGetShaderInfoLog"); SuppressUnmanagedCodeSecurity>]
     extern nativeint private ShGetShaderInfoLog_(Shader shader)
 
     let ShGetShaderInfoLog (shader : Shader) =
         let ptr = ShGetShaderInfoLog_(shader)
         Marshal.PtrToStringAnsi ptr
 
-    [<DllImport(lib, EntryPoint = "ShGetShaderInfoDebugLog")>]
+    [<DllImport(lib, EntryPoint = "ShGetShaderInfoDebugLog"); SuppressUnmanagedCodeSecurity>]
     extern nativeint private ShGetShaderInfoDebugLog_(Shader shader)
 
     let ShGetShaderInfoDebugLog (shader : Shader) =
@@ -284,26 +285,26 @@ module GLSLang =
 
 
 
-    [<DllImport(lib)>]
+    [<DllImport(lib); SuppressUnmanagedCodeSecurity>]
     extern Program ShCreateProgram()
 
-    [<DllImport(lib)>]
+    [<DllImport(lib); SuppressUnmanagedCodeSecurity>]
     extern void ShDestroyProgram(Program program)
 
-    [<DllImport(lib)>]
+    [<DllImport(lib); SuppressUnmanagedCodeSecurity>]
     extern bool ShAddShader(Program program, Shader shader)
 
-    [<DllImport(lib)>]
+    [<DllImport(lib); SuppressUnmanagedCodeSecurity>]
     extern bool ShLinkProgram(Program program, ShMessages messages)
 
-    [<DllImport(lib, EntryPoint = "ShGetProgramInfoLog")>]
+    [<DllImport(lib, EntryPoint = "ShGetProgramInfoLog"); SuppressUnmanagedCodeSecurity>]
     extern nativeint private ShGetProgramInfoLog_(Program shader)
 
     let ShGetProgramInfoLog (program : Program) =
         let ptr = ShGetProgramInfoLog_(program)
         Marshal.PtrToStringAnsi ptr
 
-    [<DllImport(lib, EntryPoint = "ShGetProgramInfoDebugLog")>]
+    [<DllImport(lib, EntryPoint = "ShGetProgramInfoDebugLog"); SuppressUnmanagedCodeSecurity>]
     extern nativeint private ShGetProgramInfoDebugLog_(Program shader)
 
     let ShGetProgramInfoDebugLog (program : Program) =
@@ -311,10 +312,10 @@ module GLSLang =
         Marshal.PtrToStringAnsi ptr
 
 
-    [<DllImport(lib, EntryPoint = "ShGetSpirVForProgramStage")>]
+    [<DllImport(lib, EntryPoint = "ShGetSpirVForProgramStage"); SuppressUnmanagedCodeSecurity>]
     extern nativeint private ShGetSpirVForProgramStage_(Program program, ShLanguage stage, uint64* size)
 
-    [<DllImport(lib)>]
+    [<DllImport(lib); SuppressUnmanagedCodeSecurity>]
     extern void private ShFreeSpirV(nativeint data, uint64 size)
     
     let ShGetSpirVForProgramStage(program : Program, stage : ShLanguage) =
