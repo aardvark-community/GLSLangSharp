@@ -15,12 +15,6 @@ type ShLanguage =
     | Fragment = 4
     | Compute = 5
 
-type ShOptimizationLevel =
-    | NoGeneration = 0
-    | None = 1
-    | Simple = 2
-    | Full = 3
-
 type ShMessages =
     | Default          = 0x0000000  // default is to give all required errors and extra warnings
     | RelaxedErrors    = 0x0000001  // be liberal in accepting input
@@ -30,30 +24,37 @@ type ShMessages =
     | VulkanRules      = 0x0000010  // issue messages for Vulkan-requirements of GLSL for SPIR-V
     | OnlyPreprocessor = 0x0000020  // only print out errors produced by the preprocessor
 
+type ShProfile =
+    | BadProfile           = 0
+    | NoProfile            = 1 // only for desktop, before profiles showed up
+    | CoreProfile          = 2
+    | CompatibilityProfile = 4
+    | EsProfile            = 8
+
 [<StructLayout(LayoutKind.Sequential)>]
 type TLimits =
     struct
-        val mutable public nonInductiveForLoops : int
-        val mutable public whileLoops : int
-        val mutable public doWhileLoops : int
-        val mutable public generalUniformIndexing : int
-        val mutable public generalAttributeMatrixVectorIndexing : int
-        val mutable public generalVaryingIndexing : int
-        val mutable public generalSamplerIndexing : int
-        val mutable public generalVariableIndexing : int
-        val mutable public generalConstantMatrixVectorIndexing : int
+        val mutable public nonInductiveForLoops : uint8
+        val mutable public whileLoops : uint8
+        val mutable public doWhileLoops : uint8
+        val mutable public generalUniformIndexing : uint8
+        val mutable public generalAttributeMatrixVectorIndexing : uint8
+        val mutable public generalVaryingIndexing : uint8
+        val mutable public generalSamplerIndexing : uint8
+        val mutable public generalVariableIndexing : uint8
+        val mutable public generalConstantMatrixVectorIndexing : uint8
 
         static member Default =
             TLimits(
-                nonInductiveForLoops = 1,
-                whileLoops = 1,
-                doWhileLoops = 1,
-                generalUniformIndexing = 1,
-                generalAttributeMatrixVectorIndexing = 1,
-                generalVaryingIndexing = 1,
-                generalSamplerIndexing = 1,
-                generalVariableIndexing = 1,
-                generalConstantMatrixVectorIndexing = 1
+                nonInductiveForLoops = 1uy,
+                whileLoops = 1uy,
+                doWhileLoops = 1uy,
+                generalUniformIndexing = 1uy,
+                generalAttributeMatrixVectorIndexing = 1uy,
+                generalVaryingIndexing = 1uy,
+                generalSamplerIndexing = 1uy,
+                generalVariableIndexing = 1uy,
+                generalConstantMatrixVectorIndexing = 1uy
             )
 
     end
@@ -263,18 +264,9 @@ module GLSLang =
 
     [<DllImport(lib, EntryPoint = "ShSetShaderSource")>]
     extern bool ShSetShaderSource(Shader shader, nativeint shaderStrings, nativeint shaderStringLength, int numSources)
-    //extern bool ShSetShaderSource(Shader shader, byte* shaderString, int shaderStringLength)
-
-//    let ShSetShaderSource(shader : Shader, shaderString : string) =
-//        let arr = System.Text.ASCIIEncoding.ASCII.GetBytes shaderString
-//        let ptr = NativePtr.ofNativeInt (Marshal.AllocHGlobal (arr.Length + 1))
-//        for i in 0..arr.Length-1 do NativePtr.set ptr i arr.[i]
-//        NativePtr.set ptr arr.Length 0uy
-//        
-//        ShSetShaderSource_(shader, ptr, shaderString.Length)
 
     [<DllImport(lib)>]
-    extern bool ShParseShader(Shader shader, TBuiltInResource* resources, int defaultVersion, bool forwardCompatible, ShMessages messages)
+    extern bool ShParseShader(Shader shader, TBuiltInResource* resources, int defaultVersion, ShProfile defaultProfile, int forceDefault, int forwardCompatible, ShMessages messages)
 
     [<DllImport(lib, EntryPoint = "ShGetShaderInfoLog")>]
     extern nativeint private ShGetShaderInfoLog_(Shader shader)
@@ -331,7 +323,7 @@ module GLSLang =
 
         if ptr = 0n then null
         else
-            let data : uint32[] = Array.zeroCreate (int (size / 4UL))
+            let data : uint8[] = Array.zeroCreate (int size)
             let gc = GCHandle.Alloc(data, GCHandleType.Pinned)
             try 
                 Marshal.Copy(ptr, gc.AddrOfPinnedObject(), size)

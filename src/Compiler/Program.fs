@@ -4,33 +4,21 @@
 open Aardvark.Base
 open GLSLang
 open GLSLang.SpirV
-let code = """#version 140
+let code = """#version 420 core
 #extension GL_ARB_separate_shader_objects : enable
 #extension GL_ARB_shading_language_420pack : enable
-layout( binding = 0) uniform buf {
-        mat4 MVP;
-        vec4 position[12*3];
-        vec4 attr[12*3];
-} ubuf;
+#extension GL_ARB_tessellation_shader : enable
 
-layout (binding = 1, set = 0) uniform _sepp { 
-    vec4 test;
-} sepp;
+layout(set = 0, binding = 0) uniform sampler2D samplers[2];
 
-layout(location = 0) in vec4 myPos;
-
-layout (location = 0) out vec4 texcoord;
-void main() 
+layout(location = 0) in vec2 DiffuseColorCoordinates;
+layout(location = 0) out vec4 ColorsOut;
+void main()
 {
-    texcoord = ubuf.attr[gl_VertexID];
-    gl_Position = ubuf.MVP * ubuf.position[gl_VertexID] + myPos - sepp.test;
-
-    // GL->VK conventions
-    gl_Position.y = -gl_Position.y;
-    gl_Position.z = (gl_Position.z + gl_Position.w) / 2.0;
+    int index = (((DiffuseColorCoordinates.x > 0.5)) ? (1) : (0));
+    ColorsOut = texture(samplers[index], DiffuseColorCoordinates);
 }
-
-    """
+"""
 
 [<EntryPoint>]
 let main argv = 
@@ -40,6 +28,7 @@ let main argv =
 
     match GLSLang.tryCompileSpirVBinary ShaderStage.Vertex code with
         | Success theirs ->
+            let theirs = theirs.UnsafeCoerce<uint32>()
             let m = Module.ofArray theirs
 
             for i in m.instructions do

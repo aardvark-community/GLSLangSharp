@@ -61,7 +61,12 @@ type Shader internal(handle : Raw.Shader) =
         if handle = 0n then
             raise <| ObjectDisposedException("Shader")
 
-        let success = Raw.GLSLang.ShParseShader(handle, NativePtr.ofNativeInt resources, 140, false, Raw.ShMessages.Default)
+        let success = 
+            Raw.GLSLang.ShParseShader(
+                handle, NativePtr.ofNativeInt resources, 140, Raw.ShProfile.CompatibilityProfile, 
+                0, 0, 
+                Raw.ShMessages.SpvRules
+            )
 
         if success then (true, "")
         else (false, Raw.GLSLang.ShGetShaderInfoLog(handle))

@@ -22,3 +22,5 @@ x64
 /.paket/paket.exe
 /paket-files
 /.fake
+/src/*.db
+/src/*.opendb
