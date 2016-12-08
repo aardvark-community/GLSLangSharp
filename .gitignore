@@ -24,3 +24,5 @@ x64
 /.fake
 /src/*.db
 /src/*.opendb
+/src/GLSLangNative/*.o
+/src/GLSLangNative/*.so

@@ -1,8 +1,9 @@
 // spirv.cpp : Defines the exported functions for the DLL application.
 //
 
-
+#ifndef __GNUC__
 #include "stdafx.h"
+#endif
 #include "glslang.h"
 
 DllExport(bool) ShInitializeProcess()
