@@ -1,10 +1,13 @@
-source https://vrvis.myget.org/F/aardvark_public/api/v3/index.json
+framework: net45
 source https://api.nuget.org/v3/index.json
+source https://vrvis.myget.org/F/aardvark_public/api/v3/index.json
 
-nuget Aardvark.Base                >= 2.4.1
-nuget Aardvark.Base.FSharp         >= 2.4.1
+nuget FSharp.Core                  >= 4.0.0.1
+nuget Aardvark.Base                >= 3.0.35
+nuget Aardvark.Base.FSharp         >= 3.0.35
 
 group Build
+framework: net45
 content: none
 source https://api.nuget.org/v3/index.json
 source https://vrvis.myget.org/F/aardvark_public/api/v3/index.json
