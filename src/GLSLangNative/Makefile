@@ -7,7 +7,7 @@ deploy: libGLSLangNative.so
 	cp libGLSLangNative.so ../../bin/Release/
 	
 glslang.o: glslang.cpp glslang.h
-	g++ -I ../../libs/include -std=c++11 -fPIC -c glslang.cpp -o glslang.o
+	g++ -I  /usr/local/include/SPIRV/ -I /usr/local/include/glslang/Public -I /usr/local/include/glslang/Include -std=c++11 -fPIC -c glslang.cpp -o glslang.o
 
 libGLSLangNative.so: glslang.o
 	g++ glslang.o -shared -o libGLSLangNative.so -lglslang -lHLSL -lOGLCompiler -lOSDependent -lSPIRV -lSPVRemapper

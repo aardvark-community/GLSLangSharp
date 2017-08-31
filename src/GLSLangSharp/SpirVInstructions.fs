@@ -1116,16 +1116,15 @@ module Module =
             Module.instructions = instructions
         }
 
-    let ofArray (arr : uint32[]) =
-        let byteArr = Array.copy(arr).UnsafeCoerce<byte>()
-        use ms = new MemoryStream(byteArr)
+    let ofArray (arr : byte[]) =
+        use ms = new MemoryStream(arr)
         ofStream ms
 
     let tryOfStream (s : Stream) =
         try s |> ofStream |> Some
         with SpirVException str -> None
 
-    let tryOfArray (s : uint32[]) =
+    let tryOfArray (s : byte[]) =
         try s |> ofArray |> Some
         with SpirVException str -> None
 
@@ -1149,4 +1148,4 @@ module Module =
         use ms = new MemoryStream()
         writeTo ms m
         ms.Flush()
-        ms.ToArray().UnsafeCoerce<uint32>()
+        ms.ToArray()

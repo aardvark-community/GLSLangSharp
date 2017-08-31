@@ -28,7 +28,6 @@ let main argv =
 
     match GLSLang.tryCompileSpirVBinary ShaderStage.Vertex code with
         | Success theirs ->
-            let theirs = theirs.UnsafeCoerce<uint32>()
             let m = Module.ofArray theirs
 
             for i in m.instructions do
