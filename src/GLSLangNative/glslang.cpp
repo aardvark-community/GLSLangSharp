@@ -104,6 +104,7 @@ static TBuiltInResource defRes =
 		/* maxCullDistances */ 8,
 		/* maxCombinedClipAndCullDistances */ 8,
 		/* maxSamples */ 4,
+		/* limits */ defLimits
 	};
 
 
