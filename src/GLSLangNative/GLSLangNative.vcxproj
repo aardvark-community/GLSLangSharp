@@ -106,7 +106,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)..\libs\static\Debug\windows\x86\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glslang.lib;HLSL.lib;OGLCompiler.lib;OSDependent.lib;SPIRV.lib;SPVRemapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glslangd.lib;HLSLd.lib;OGLCompilerd.lib;OSDependentd.lib;SPIRVd.lib;SPVRemapperd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
       <Command>xcopy /Y $(SolutionDir)..\bin\Debug\GLSLangNative.* $(SolutionDir)..\bin\Release\</Command>
@@ -127,7 +127,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)..\libs\static\Debug\windows\AMD64\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glslang.lib;HLSL.lib;OGLCompiler.lib;OSDependent.lib;SPIRV.lib;SPVRemapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glslangd.lib;HLSLd.lib;OGLCompilerd.lib;OSDependentd.lib;SPIRVd.lib;SPVRemapperd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
       <Outputs>$(SolutionDir)..\bin\Release\GLSLangNative.dll;$(SolutionDir)..\bin\Release\GLSLangNative.pdb;$(SolutionDir)..\bin\Release\GLSLangNative.exp;$(SolutionDir)..\bin\Release\GLSLangNative.ilk;$(SolutionDir)..\bin\Release\GLSLangNative.lib;%(Outputs)</Outputs>

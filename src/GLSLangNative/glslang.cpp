@@ -6,6 +6,134 @@
 #endif
 #include "glslang.h"
 
+static TLimits defLimits =
+	{
+		/* nonInductiveForLoops */ true,
+		/* whileLoops */ true,
+		/* doWhileLoops */ true,
+		/* generalUniformIndexing */ true,
+		/* generalAttributeMatrixVectorIndexing */ true,
+		/* generalVaryingIndexing */ true,
+		/* generalSamplerIndexing */ true,
+		/* generalVariableIndexing */ true,
+		/* generalConstantMatrixVectorIndexing */ true
+	};
+
+static TBuiltInResource defRes = 
+	{ 
+		/* maxLights */ 32,
+		/* maxClipPlanes */ 6,
+		/* maxTextureUnits */ 32,
+		/* maxTextureCoords */ 32,
+		/* maxVertexAttribs */ 64,
+		/* maxVertexUniformComponents */ 4096,
+		/* maxVaryingFloats */ 64,
+		/* maxVertexTextureImageUnits */ 32,
+		/* maxCombinedTextureImageUnits */ 80,
+		/* maxTextureImageUnits */ 32,
+		/* maxFragmentUniformComponents */ 4096,
+		/* maxDrawBuffers */ 32,
+		/* maxVertexUniformVectors */ 128,
+		/* maxVaryingVectors */ 8,
+		/* maxFragmentUniformVectors */ 16,
+		/* maxVertexOutputVectors */ 16,
+		/* maxFragmentInputVectors */ 15,
+		/* minProgramTexelOffset */ 8,
+		/* maxProgramTexelOffset */ 7,
+		/* maxClipDistances */ 8,
+		/* maxComputeWorkGroupCountX */ 65535,
+		/* maxComputeWorkGroupCountY */ 65535,
+		/* maxComputeWorkGroupCountZ */ 65535,
+		/* maxComputeWorkGroupSizeX */ 1024,
+		/* maxComputeWorkGroupSizeY */ 1024,
+		/* maxComputeWorkGroupSizeZ */ 64,
+		/* maxComputeUniformComponents */ 1024,
+		/* maxComputeTextureImageUnits */ 16,
+		/* maxComputeImageUniforms */ 8,
+		/* maxComputeAtomicCounters */ 8,
+		/* maxComputeAtomicCounterBuffers */ 1,
+		/* maxVaryingComponents */ 60 ,
+		/* maxVertexOutputComponents */ 64,
+		/* maxGeometryInputComponents */ 64,
+		/* maxGeometryOutputComponents */ 128,
+		/* maxFragmentInputComponents */ 128,
+		/* maxImageUnits */ 8,
+		/* maxCombinedImageUnitsAndFragmentOutputs */ 8,
+		/* maxCombinedShaderOutputResources */ 8,
+		/* maxImageSamples */ 0,
+		/* maxVertexImageUniforms */ 0,
+		/* maxTessControlImageUniforms */ 0,
+		/* maxTessEvaluationImageUniforms */ 0,
+		/* maxGeometryImageUniforms */ 0,
+		/* maxFragmentImageUniforms */ 8,
+		/* maxCombinedImageUniforms */ 8,
+		/* maxGeometryTextureImageUnits */ 16,
+		/* maxGeometryOutputVertices */ 256,
+		/* maxGeometryTotalOutputComponents */ 1024,
+		/* maxGeometryUniformComponents */ 1024,
+		/* maxGeometryVaryingComponents */ 64,
+		/* maxTessControlInputComponents */ 128,
+		/* maxTessControlOutputComponents */ 128,
+		/* maxTessControlTextureImageUnits */ 16,
+		/* maxTessControlUniformComponents */ 1024,
+		/* maxTessControlTotalOutputComponents */ 4096,
+		/* maxTessEvaluationInputComponents */ 128,
+		/* maxTessEvaluationOutputComponents */ 128,
+		/* maxTessEvaluationTextureImageUnits */ 16,
+		/* maxTessEvaluationUniformComponents */ 1024,
+		/* maxTessPatchComponents */ 120,
+		/* maxPatchVertices */ 32,
+		/* maxTessGenLevel */ 64,
+		/* maxViewports */ 16,
+		/* maxVertexAtomicCounters */ 0,
+		/* maxTessControlAtomicCounters */ 0,
+		/* maxTessEvaluationAtomicCounters */ 0,
+		/* maxGeometryAtomicCounters */ 0,
+		/* maxFragmentAtomicCounters */ 8,
+		/* maxCombinedAtomicCounters */ 8,
+		/* maxAtomicCounterBindings */ 1,
+		/* maxVertexAtomicCounterBuffers */ 0,
+		/* maxTessControlAtomicCounterBuffers */ 0,
+		/* maxTessEvaluationAtomicCounterBuffers */ 0,
+		/* maxGeometryAtomicCounterBuffers */ 0,
+		/* maxFragmentAtomicCounterBuffers */ 1,
+		/* maxCombinedAtomicCounterBuffers */ 1,
+		/* maxAtomicCounterBufferSize */ 16384,
+		/* maxTransformFeedbackBuffers */ 4,
+		/* maxTransformFeedbackInterleavedComponents */ 64,
+		/* maxCullDistances */ 8,
+		/* maxCombinedClipAndCullDistances */ 8,
+		/* maxSamples */ 4,
+	};
+
+
+static int failProgram(glslang::TProgram& program, int* size, char** logBuffer)
+{
+	if (logBuffer)
+	{
+		auto log = program.getInfoLog();
+		auto logLen = strlen(log);
+		*logBuffer = new char[logLen];
+		*size = (int)logLen;
+		memcpy(*logBuffer, log, logLen);
+	}
+	return 1;
+}
+
+static int failShader(glslang::TShader& shader, int* size, char** logBuffer)
+{
+	if (logBuffer)
+	{
+		auto log = shader.getInfoLog();
+		auto logLen = strlen(log);
+		*logBuffer = new char[logLen];
+		*size = (int)logLen;
+		memcpy(*logBuffer, log, logLen);
+	}
+	return 1;
+}
+
+
 DllExport(bool) ShInitializeProcess()
 {
 	return ShInitialize() != 0;
@@ -16,117 +144,90 @@ DllExport(void) ShFinalizeProcess()
 	ShFinalize();
 }
 
-
-
-DllExport(glslang::TShader*) ShCreateShader(EShLanguage language)
+DllExport(int) ShCompileShader(EShLanguage lang, const char* entryName, const char* code, int nDefines, const char* defines[], size_t* outputSize, void** output, int* logLength, char** log)
 {
-	if (language < 0 || language >= EShLangCount) return nullptr;
-	return new glslang::TShader(language);
-}
+	glslang::TShader shader(lang);
+	shader.setStrings(&code, 1);
+	std::string preamble;
+	if (nDefines > 0)
+	{
+		for (int i = 0; i < nDefines; i++)
+		{
+			preamble.append("#define ");
+			preamble.append(defines[i]);
+			preamble.append("\r\n");
+		}
+		shader.setPreamble(preamble.c_str());
+	}
+	shader.setEntryPoint(entryName);
 
-DllExport(void) ShDestroyShader(glslang::TShader* shader)
-{
-	if (shader) delete shader;
-}
+	if (shader.parse(&defRes, 1, false, EShMsgDefault))
+	{
+		glslang::TProgram program;
+		program.addShader(&shader);
 
-DllExport(bool) ShSetShaderSource(glslang::TShader* shader, const char* const* shaderStrings, int* shaderStringLength, int numSources)
-{
-	if (!shader || !shaderStrings || !shaderStringLength) return false;
+		if (program.link(EShMsgDefault))
+		{
+			auto intermediate = program.getIntermediate(lang);
+			if (!intermediate) {
+				*output = nullptr;
+				*outputSize = 0;
+				return failProgram(program, logLength, log);
+			}
 
-	shader->setStringsWithLengths(shaderStrings, shaderStringLength, numSources);
-	return true;
-}
+			std::vector<unsigned int> spirv;
+			glslang::GlslangToSpv(*intermediate, spirv);
 
-DllExport(bool) ShParseShader(glslang::TShader* shader, const TBuiltInResource* resources, int defaultVersion, EProfile defaultProfile, int forceDefault, int forwardCompatible, EShMessages messages)
-{
-	if (!shader || !resources) return false;
-	return shader->parse(resources, defaultVersion, defaultProfile, (forceDefault != 0), (forwardCompatible != 0), messages);
-	//return shader->parse(resources, defaultVersion, forwardCompatible, messages);
-}
+			auto intSize = spirv.size();
 
-DllExport(const char*) ShGetShaderInfoLog(glslang::TShader* shader)
-{
-	if (!shader) return nullptr;
+			if (intSize <= 0) {
+				*output = nullptr;
+				*outputSize = 0;
+				return failProgram(program, logLength, log);
+			}
 
-	return shader->getInfoLog();
-}
+			auto result = new int[intSize];
+			std::copy(spirv.begin(), spirv.end(), result);
 
-DllExport(const char*) ShGetShaderInfoDebugLog(glslang::TShader* shader)
-{
-	if (!shader) return nullptr;
+			*output = (void*)result;
+			*outputSize = 4 * intSize;
 
-	return shader->getInfoDebugLog();
-}
+			if(log) 
+			{
+				std::string str;
+				str.append("#SHADER\r\n");
+				str.append(shader.getInfoLog());
+				str.append("#PROGRAM\r\n");
+				str.append(program.getInfoLog());
 
+				auto len = str.length() + 1;
+				auto temp = new char[len];
+				strncpy_s(temp, len, str.c_str(), len);
+				*logLength = (int)(len - 1);
+				*log = temp;
 
-
-DllExport(glslang::TProgram*) ShCreateProgram()
-{
-	return new glslang::TProgram;
-}
-
-DllExport(void) ShDestroyProgram(glslang::TProgram* program)
-{
-	if (program) delete program;
-}
-
-DllExport(bool) ShAddShader(glslang::TProgram* program, glslang::TShader* shader)
-{
-	if (!program || !shader) return false;
-
-	program->addShader(shader);
-	return true;
-}
-
-DllExport(bool) ShLinkProgram(glslang::TProgram* program, EShMessages messages)
-{
-	if (!program)return false;
-
-	return program->link(messages);
-}
-
-DllExport(const char*) ShGetProgramInfoLog(glslang::TProgram* program)
-{
-	if (!program)return nullptr;
-	return program->getInfoLog();
-}
-
-DllExport(const char*) ShGetProgramInfoDebugLog(glslang::TProgram* program)
-{
-	if (!program)return nullptr;
-	return program->getInfoDebugLog();
-}
+			}
 
 
-DllExport(void*) ShGetSpirVForProgramStage(glslang::TProgram* program, EShLanguage stage, size_t* size)
-{
-	if (!program) {
-		*size = 0;  return nullptr;
+			return 0;
+		}
+		else
+		{
+			*output = nullptr;
+			*outputSize = 0;
+			return failProgram(program, logLength, log);
+		}
+	}
+	else
+	{
+		*output = nullptr;
+		*outputSize = 0;
+		return failShader(shader, logLength, log);
 	}
 
-	auto intermediate = program->getIntermediate(stage);
-	if (!intermediate) {
-		*size = 0; return nullptr;
-	}
-
-	std::vector<unsigned int> spirv;
-	glslang::GlslangToSpv(*intermediate, spirv);
-
-	if (spirv.size() == 0) {
-		*size = 0; return nullptr;
-	}
-
-	auto result = new unsigned int[spirv.size()];
-
-	for (int i = 0; i < (int)spirv.size(); i++)
-		result[i] = spirv[i];
-
-	*size = 4 * spirv.size();
-	return (void*)result;
 }
 
-DllExport(void) ShFreeSpirV(void* data, size_t size)
+DllExport(void) ShFree(void* memory)
 {
-	auto ptr = (unsigned int*)data;
-	delete ptr;
+	delete memory;
 }
