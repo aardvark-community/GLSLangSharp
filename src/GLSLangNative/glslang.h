@@ -1,6 +1,7 @@
 #pragma once
 
 #include<vector>
+#include <string.h>
 #include <ShaderLang.h>
 #include <GlslangToSpv.h>
 

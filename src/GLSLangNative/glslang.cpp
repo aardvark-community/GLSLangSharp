@@ -204,7 +204,7 @@ DllExport(int) ShCompileShader(EShLanguage lang, const char* entryName, const ch
 
 				auto len = str.length() + 1;
 				auto temp = new char[len];
-				strncpy_s(temp, len, str.c_str(), len);
+				strncpy(temp, str.c_str(), len);
 				*logLength = (int)(len - 1);
 				*log = temp;
 
