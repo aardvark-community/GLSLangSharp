@@ -3,3 +3,4 @@ id GLSLangSharp
 authors krauthaufen
 description
     void
+include-pdbs true

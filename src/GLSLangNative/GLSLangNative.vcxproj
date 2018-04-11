@@ -22,7 +22,7 @@
     <ProjectGuid>{7B1514AD-2B7E-4D93-9A84-1E2C7F09ECD7}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>GLSLangNative</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
