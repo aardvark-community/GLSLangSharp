@@ -1,31 +1,27 @@
 RESTRICTION: || (== net461) (== netcoreapp2.0) (== netstandard2.0)
 NUGET
-  remote: https://vrvis.myget.org/F/aardvark_public/api/v3/index.json
-    Aardvark.Base (4.0.1)
-      DevILSharp (>= 0.2.1 < 0.3)
+  remote: https://api.nuget.org/v3/index.json
+    Aardvark.Base (4.0.20)
+      Aardvark.Base.Telemetry (4.0.20)
+      DevILSharp (>= 0.2.4 < 0.3)
       System.Collections.Immutable (>= 1.4)
-    Aardvark.Base.FSharp (4.0.1)
-      Aardvark.Base (4.0.1)
-      Aardvark.Base.TypeProviders (4.0.1)
-      DevILSharp (>= 0.2.1 < 0.3)
+    Aardvark.Base.FSharp (4.0.20)
+      Aardvark.Base (4.0.20)
+      Aardvark.Base.TypeProviders (4.0.20)
+      DevILSharp (>= 0.2.4 < 0.3)
       FSharp.Core (>= 4.3 < 4.4)
       System.Dynamic.Runtime (>= 4.3 < 4.4)
-    Aardvark.Base.TypeProviders (4.0.1)
+    Aardvark.Base.Telemetry (4.0.20)
+    Aardvark.Base.TypeProviders (4.0.20)
       FSharp.Core (>= 4.3 < 4.4)
-    DevILSharp (0.2.1)
-      FSharp.Core (>= 4.3 < 4.4)
-  remote: https://api.nuget.org/v3/index.json
     FSharp.Core (4.3.4)
-    Microsoft.NETCore.Platforms (2.0.1) - restriction: || (== net461) (&& (== netcoreapp2.0) (< netstandard1.0)) (&& (== netcoreapp2.0) (< netstandard1.2)) (&& (== netcoreapp2.0) (< netstandard1.3)) (&& (== netcoreapp2.0) (< netstandard1.4)) (&& (== netcoreapp2.0) (< netstandard1.5)) (&& (== netcoreapp2.0) (< netstandard1.6)) (&& (== netcoreapp2.0) (< netstandard2.0)) (&& (== netcoreapp2.0) (< portable-net45+win8+wpa81)) (&& (== netcoreapp2.0) (>= wp8))
-    Microsoft.NETCore.Targets (2.0) - restriction: || (&& (== net461) (>= dnxcore50)) (&& (== net461) (< net45)) (== netcoreapp2.0) (== netstandard2.0)
-    NETStandard.Library (2.0.2) - restriction: || (== net461) (&& (== netcoreapp2.0) (< netstandard2.0))
-      Microsoft.NETCore.Platforms (>= 1.1)
+    Microsoft.NETCore.Platforms (2.1) - restriction: || (&& (== net461) (>= dnxcore50)) (&& (== net461) (< net45)) (== netcoreapp2.0) (== netstandard2.0)
+    Microsoft.NETCore.Targets (2.1) - restriction: || (&& (== net461) (>= dnxcore50)) (&& (== net461) (< net45)) (== netcoreapp2.0) (== netstandard2.0)
     System.Collections (4.3) - restriction: || (&& (== net461) (>= dnxcore50)) (&& (== net461) (< net45)) (== netcoreapp2.0) (== netstandard2.0)
       Microsoft.NETCore.Platforms (>= 1.1) - restriction: || (&& (== net461) (>= dnxcore50)) (&& (== net461) (< net45)) (== netcoreapp2.0) (== netstandard2.0)
       Microsoft.NETCore.Targets (>= 1.1) - restriction: || (&& (== net461) (>= dnxcore50)) (&& (== net461) (< net45)) (== netcoreapp2.0) (== netstandard2.0)
       System.Runtime (>= 4.3) - restriction: || (&& (== net461) (>= dnxcore50)) (&& (== net461) (< net45)) (== netcoreapp2.0) (== netstandard2.0)
-    System.Collections.Immutable (1.4)
-      NETStandard.Library (>= 1.6.1) - restriction: || (== net461) (&& (== netcoreapp2.0) (< netstandard2.0))
+    System.Collections.Immutable (1.5)
     System.Diagnostics.Debug (4.3) - restriction: || (&& (== net461) (>= dnxcore50)) (&& (== net461) (< net45)) (== netcoreapp2.0) (== netstandard2.0)
       Microsoft.NETCore.Platforms (>= 1.1) - restriction: || (&& (== net461) (>= dnxcore50)) (&& (== net461) (< net45)) (== netcoreapp2.0) (== netstandard2.0)
       Microsoft.NETCore.Targets (>= 1.1) - restriction: || (&& (== net461) (>= dnxcore50)) (&& (== net461) (< net45)) (== netcoreapp2.0) (== netstandard2.0)
@@ -115,7 +111,7 @@ NUGET
       Microsoft.NETCore.Platforms (>= 1.1) - restriction: || (&& (== net461) (>= dnxcore50)) (&& (== net461) (< net45)) (== netcoreapp2.0) (== netstandard2.0)
       Microsoft.NETCore.Targets (>= 1.1) - restriction: || (&& (== net461) (>= dnxcore50)) (&& (== net461) (< net45)) (== netcoreapp2.0) (== netstandard2.0)
       System.Runtime (>= 4.3) - restriction: || (&& (== net461) (>= dnxcore50)) (&& (== net461) (< net45)) (== netcoreapp2.0) (== netstandard2.0)
-    System.Reflection.TypeExtensions (4.4) - restriction: || (&& (== net461) (>= dnxcore50)) (&& (== net461) (< net45)) (== netcoreapp2.0) (== netstandard2.0)
+    System.Reflection.TypeExtensions (4.5) - restriction: || (&& (== net461) (>= dnxcore50)) (&& (== net461) (< net45)) (== netcoreapp2.0) (== netstandard2.0)
     System.Resources.ResourceManager (4.3) - restriction: || (&& (== net461) (>= dnxcore50)) (&& (== net461) (< net45)) (== netcoreapp2.0) (== netstandard2.0)
       Microsoft.NETCore.Platforms (>= 1.1) - restriction: || (&& (== net461) (>= dnxcore50)) (&& (== net461) (< net45)) (== netcoreapp2.0) (== netstandard2.0)
       Microsoft.NETCore.Targets (>= 1.1) - restriction: || (&& (== net461) (>= dnxcore50)) (&& (== net461) (< net45)) (== netcoreapp2.0) (== netstandard2.0)
@@ -140,18 +136,21 @@ NUGET
       Microsoft.NETCore.Platforms (>= 1.1) - restriction: || (&& (== net461) (>= dnxcore50)) (&& (== net461) (< net45)) (== netcoreapp2.0) (== netstandard2.0)
       Microsoft.NETCore.Targets (>= 1.1) - restriction: || (&& (== net461) (>= dnxcore50)) (&& (== net461) (< net45)) (== netcoreapp2.0) (== netstandard2.0)
       System.Runtime (>= 4.3) - restriction: || (&& (== net461) (>= dnxcore50)) (&& (== net461) (< net45)) (== netcoreapp2.0) (== netstandard2.0)
+  remote: https://vrvis.myget.org/F/aardvark_public/api/v3/index.json
+    DevILSharp (0.2.4)
+      FSharp.Core (>= 4.3 < 4.4)
 
 GROUP Build
 CONTENT: NONE
 RESTRICTION: == net45
 NUGET
   remote: https://api.nuget.org/v3/index.json
-    FAKE (4.63.2) - content: none
-    Mono.Cecil (0.10) - content: none
-    SourceLink.Fake (1.1) - content: none
+    FAKE (4.63.2)
+    Mono.Cecil (0.10)
+    SourceLink.Fake (1.1)
 GITHUB
   remote: vrvis/aardvark.fake
-    FULLPROJECT (bfae10520868567c41bfa9196a7ac7ef79bb50f6)
+    FULLPROJECT (7bebbfdb07cbf4ec6426be3f813dc367a0614e6a)
       FAKE (>= 4.63 < 4.64)
       Mono.Cecil (>= 0.10.0-beta6 < 0.11)
       SourceLink.Fake (>= 1.1 < 1.2)
