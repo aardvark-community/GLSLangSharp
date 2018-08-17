@@ -6,6 +6,7 @@
 #endif
 #include "glslang.h"
 
+
 static TLimits defLimits =
 	{
 		/* nonInductiveForLoops */ true,
@@ -232,4 +233,66 @@ DllExport(int) ShCompileShader(EShLanguage lang, const char* entryName, const ch
 DllExport(void) ShFree(void* memory)
 {
 	delete memory;
+}
+
+std::string CanonicalizeFlag(const char* const* argv, int argc, int* argi) {
+	const char* cur_arg = argv[*argi];
+	const char* next_arg = (*argi + 1 < argc) ? argv[*argi + 1] : nullptr;
+	std::ostringstream canonical_arg;
+	canonical_arg << cur_arg;
+
+	// NOTE: DO NOT ADD NEW FLAGS HERE.
+	//
+	// These flags are supported for backwards compatibility.  When adding new
+	// passes that need extra arguments in its command-line flag, please make them
+	// use the syntax "--pass_name[=pass_arg].
+	if (0 == strcmp(cur_arg, "--set-spec-const-default-value") ||
+		0 == strcmp(cur_arg, "--loop-fission") ||
+		0 == strcmp(cur_arg, "--loop-fusion") ||
+		0 == strcmp(cur_arg, "--loop-unroll-partial") ||
+		0 == strcmp(cur_arg, "--loop-peeling-threshold")) {
+		if (next_arg) {
+			canonical_arg << "=" << next_arg;
+			++(*argi);
+		}
+	}
+
+	return canonical_arg.str();
+}
+
+DllExport(void) ShOptimize(const void* input, const size_t inputLength, void** output, size_t* outputLength, const char* const* passNames, int32_t passCount)
+{
+	spvtools::Optimizer opt(SPV_ENV_UNIVERSAL_1_3);
+	if (passNames)
+	{
+		std::vector<std::string> passes;
+		int i = 0;
+		while (i < passCount) {
+			auto n = CanonicalizeFlag(passNames, passCount, &i);
+			passes.push_back(n);
+			i++;
+		}
+		opt.RegisterPassesFromFlags(passes);
+	}
+	else
+	{
+		opt.RegisterPerformancePasses();
+	}
+
+	std::vector<uint32_t> result;
+	if (opt.Run((const uint32_t*)input, inputLength / sizeof(uint32_t), &result))
+	{
+		auto res = new uint32_t[result.size()];
+		std::copy(result.begin(), result.end(), res);
+		*output = (void*)res;
+		*outputLength = result.size() * sizeof(uint32_t);
+	}
+	else
+	{
+		auto res = new char[inputLength];
+		memcpy(res, input, inputLength);
+		*output = (void*)res;
+		*outputLength = inputLength;
+	}
+
 }

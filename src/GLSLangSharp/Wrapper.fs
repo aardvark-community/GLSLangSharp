@@ -48,3 +48,11 @@ module GLSLang =
 
     [<DllImport(lib); SuppressUnmanagedCodeSecurity>]
     extern void ShFree(void* data)
+
+    
+    [<DllImport(lib); SuppressUnmanagedCodeSecurity>]
+    extern void ShOptimize( 
+            nativeint input, unativeint inputLength,
+            nativeint& output, unativeint& outputLength,
+            string[] passNames, int passCount
+        )
