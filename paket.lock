@@ -136,7 +136,6 @@ NUGET
       Microsoft.NETCore.Platforms (>= 1.1) - restriction: || (&& (== net461) (>= dnxcore50)) (&& (== net461) (< net45)) (== netcoreapp2.0) (== netstandard2.0)
       Microsoft.NETCore.Targets (>= 1.1) - restriction: || (&& (== net461) (>= dnxcore50)) (&& (== net461) (< net45)) (== netcoreapp2.0) (== netstandard2.0)
       System.Runtime (>= 4.3) - restriction: || (&& (== net461) (>= dnxcore50)) (&& (== net461) (< net45)) (== netcoreapp2.0) (== netstandard2.0)
-  remote: https://vrvis.myget.org/F/aardvark_public/api/v3/index.json
     DevILSharp (0.2.4)
       FSharp.Core (>= 4.3 < 4.4)
 
