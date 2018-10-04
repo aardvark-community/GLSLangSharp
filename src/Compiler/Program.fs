@@ -29,13 +29,31 @@ uniform sampler2D thing;
 
 #ifdef Fragment
 
+
+int myfun(int a, int b) 
+{
+    int x = a*a;
+    for(int i = 0; i < b; i++) 
+    {
+        x = x * b;
+    }
+    return x;
+}
+
 layout(location = 0) in vec2 DiffuseColorCoordinates;
 layout(location = 0) out vec4 ColorsOut;
 void main()
 {
+    if(1 > 2) discard;
 
-    int index = (((DiffuseColorCoordinates.x > 0.5)) ? (1) : (0));
-    ColorsOut = texture(samplers[index], DiffuseColorCoordinates);
+
+    ivec2 s = textureSize(samplers[0], 0);
+
+    int index = 1 - 1 + (((DiffuseColorCoordinates.x > 0.5)) ? (1) : (0));
+    vec4 t = texelFetch(samplers[0], ivec2(index, textureSize(samplers[0], 0).y - 1 - index), 0);
+
+    int sepp = myfun(index, myfun(s.x,index));
+    ColorsOut = t + texture(samplers[sepp], DiffuseColorCoordinates);
 }
 
 #endif
@@ -68,16 +86,26 @@ let main argv =
         sw.Stop()
         printfn "took: %.2fµs" (1000.0 * sw.Elapsed.TotalMilliseconds / float (iter))
 
-    match GLSLang.tryCompile ShaderStage.Vertex "main" ["Vertex"] code with
+    match GLSLang.tryCompile ShaderStage.Fragment "main" ["Fragment"] code with
         | Some binary, log ->
+            let code = System.Text.StringBuilder()
             let m = Module.ofArray binary
-
             for i in m.instructions do
                 match Instruction.tryGetId i with
-                    | Some id -> printfn "%d:\t%A" id i
-                    | None -> printfn "   \t%A" i
+                    | Some id -> code.AppendLine(sprintf "%d:\t%A" id i) |> ignore
+                    | None -> code.AppendLine(sprintf "   \t%A" i) |> ignore
+            File.writeAllText @"C:\Users\Schorsch\Desktop\org.spv" (code.ToString())
+            
+            let binary = GLSLang.optimizeDefault binary
+            
+            let code = System.Text.StringBuilder()
+            let m = Module.ofArray binary
+            for i in m.instructions do
+                match Instruction.tryGetId i with
+                    | Some id -> code.AppendLine(sprintf "%d:\t%A" id i) |> ignore
+                    | None -> code.AppendLine(sprintf "   \t%A" i) |> ignore
+            File.writeAllText @"C:\Users\Schorsch\Desktop\opt.spv" (code.ToString())
 
-            printfn "%s" log
         | None, e ->
             printfn "%s" e
 
