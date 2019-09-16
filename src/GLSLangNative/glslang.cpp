@@ -172,6 +172,7 @@ DllExport(int) ShCompileShader(EShLanguage lang, const char* entryName, const ch
 	}
 	shader.setEntryPoint(entryName);
 
+	
 	auto msg = (EShMessages) (EShMsgVulkanRules | EShMsgSpvRules);
 	if (shader.parse(&defRes, 140, ECompatibilityProfile, false, false, msg))
 	{

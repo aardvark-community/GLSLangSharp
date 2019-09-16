@@ -14,6 +14,14 @@ type ShaderStage =
     | Geometry = 3
     | Fragment = 4
     | Compute = 5
+    | RayGen = 6
+    | RayIntersect = 7
+    | RayAnyHit = 8
+    | RayClosestHit = 9
+    | RayMiss = 10
+    | Callable = 11
+    | Task = 12
+    | Mesh = 13
 
 [<AutoOpen>]
 module private ``GLSLang internal functions`` =

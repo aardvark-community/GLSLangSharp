@@ -281,6 +281,13 @@ type OpCode =
     | GetDefaultQueue = 303us
     | BuildNDRange = 304us
 
+    | ReportIntersectionNV = 5334us
+    | IgnoreIntersectionNV = 5335us
+    | TerminateRayNV = 5336us
+    | TraceNV = 5337us
+    | TypeAccelerationStructureNV = 5341us
+    | ExecuteCallableNV = 5344us
+
 type SourceLanguage =
     | Unknown = 0u
     | ESSL = 1u

@@ -1,11 +1,12 @@
 #pragma once
 
-#include<vector>
-#include <string.h>
 #include <ShaderLang.h>
 #include <GlslangToSpv.h>
 #include <spirv-tools/optimizer.hpp>
 #include <sstream>
+#include<vector>
+#include <string.h>
+
 
 #if _WIN32
 #define DllExport(t) extern "C" __declspec(dllexport) t

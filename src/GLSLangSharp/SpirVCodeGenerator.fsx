@@ -297,6 +297,14 @@ let prototypes =
         { opCode = OpCode.ControlBarrier; args = [Arg("exec", typeof<Scope>); Arg("mem", typeof<Scope>); Arg("sem", typeof<MemorySemantics>)] }
         { opCode = OpCode.MemoryBarrier; args = [Arg("mem", typeof<Scope>); Arg("sem", typeof<MemorySemantics>)] }
 
+
+        { opCode = OpCode.ReportIntersectionNV; args = [ResultType; ResultId; Arg("hit", typeof<int>); Arg("hitKind", typeof<int>) ] }
+        { opCode = OpCode.IgnoreIntersectionNV; args = [] }
+        { opCode = OpCode.TerminateRayNV; args = [] }
+        { opCode = OpCode.TraceNV; args = [Arg("accell", typeof<int>); Arg("rayFlags", typeof<int>); Arg("cullMask", typeof<int>); Arg("sbtOffset", typeof<int>); Arg("sbtStride", typeof<int>); Arg("missIndex", typeof<int>); Arg("rayOrigin", typeof<int>); Arg("rayTMin", typeof<int>); Arg("rayDir", typeof<int>); Arg("rayTMax", typeof<int>); Arg("payloadId", typeof<int>)] }
+        { opCode = OpCode.TypeAccelerationStructureNV; args = [] }
+        { opCode = OpCode.ExecuteCallableNV; args = [Arg("sbtIndex", typeof<int>); Arg("dataId", typeof<int>)] }
+
         // !!!currently omitted!!!!
 
         // Group instructions
