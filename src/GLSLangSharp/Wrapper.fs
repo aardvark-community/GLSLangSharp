@@ -1,7 +1,6 @@
 ﻿namespace GLSLang.Raw
 
 open System.Security
-open Aardvark.Base
 open System.Runtime.InteropServices
 open Microsoft.FSharp.NativeInterop
 

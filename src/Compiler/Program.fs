@@ -1,9 +1,10 @@
 ﻿// Learn more about F# at http://fsharp.org
 // See the 'F# Tutorial' project for more help.
 
-open Aardvark.Base
 open GLSLang
 open GLSLang.SpirV
+open System.IO
+
 let code = """
 #version 450 core
 
@@ -172,7 +173,7 @@ let main argv =
                 match Instruction.tryGetId i with
                     | Some id -> code.AppendLine(sprintf "%d:\t%A" id i) |> ignore
                     | None -> code.AppendLine(sprintf "   \t%A" i) |> ignore
-            File.writeAllText @"C:\Users\Schorsch\Desktop\org.spv" (code.ToString())
+            File.WriteAllText(@"C:\Users\Schorsch\Desktop\org.spv", code.ToString())
             
             let binary = GLSLang.optimizeDefault binary
             
@@ -182,7 +183,7 @@ let main argv =
                 match Instruction.tryGetId i with
                     | Some id -> code.AppendLine(sprintf "%d:\t%A" id i) |> ignore
                     | None -> code.AppendLine(sprintf "   \t%A" i) |> ignore
-            File.writeAllText @"C:\Users\Schorsch\Desktop\opt.spv" (code.ToString())
+            File.WriteAllText(@"C:\Users\Schorsch\Desktop\opt.spv", code.ToString())
 
         | None, e ->
             printfn "%s" e

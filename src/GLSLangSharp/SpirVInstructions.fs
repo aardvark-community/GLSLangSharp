@@ -1123,7 +1123,6 @@ type Module =
 
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
 module Module =
-    open Aardvark.Base
 
     let inline magic (m : Module) = m.magic
     let inline version (m : Module) = m.version
