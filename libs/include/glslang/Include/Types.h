@@ -3,6 +3,7 @@
 // Copyright (C) 2012-2016 LunarG, Inc.
 // Copyright (C) 2015-2016 Google, Inc.
 // Copyright (C) 2017 ARM Limited.
+// Modifications Copyright (C) 2020 Advanced Micro Devices, Inc. All rights reserved.
 //
 // All rights reserved.
 //
@@ -79,25 +80,7 @@ struct TSampler {   // misnomer now; includes images, textures without sampler, 
     bool         ms : 1;
     bool      image : 1;  // image, combined should be false
     bool   combined : 1;  // true means texture is combined with a sampler, false means texture with no sampler
-#ifdef ENABLE_HLSL
-    unsigned int vectorSize : 3;  // vector return type size.
-    unsigned int getVectorSize() const { return vectorSize; }
-    void clearReturnStruct() { structReturnIndex = noReturnStruct; }
-    bool hasReturnStruct() const { return structReturnIndex != noReturnStruct; }
-    unsigned getStructReturnIndex() const { return structReturnIndex; }
-
-    static const unsigned structReturnIndexBits = 4;                        // number of index bits to use.
-    static const unsigned structReturnSlots = (1<<structReturnIndexBits)-1; // number of valid values
-    static const unsigned noReturnStruct = structReturnSlots;               // value if no return struct type.
-
-    // Index into a language specific table of texture return structures.
-    unsigned int structReturnIndex : structReturnIndexBits;
-#else
-    unsigned int getVectorSize() const { return 4; }
-    void clearReturnStruct() const { }
-    bool hasReturnStruct() const { return false; }
-    unsigned getStructReturnIndex() const { return 0; }
-#endif
+    bool    sampler : 1;  // true means a pure sampler, other fields should be clear()
 
 #ifdef GLSLANG_WEB
     bool is1D()          const { return false; }
@@ -105,8 +88,6 @@ struct TSampler {   // misnomer now; includes images, textures without sampler, 
     bool isRect()        const { return false; }
     bool isSubpass()     const { return false; }
     bool isCombined()    const { return true; }
-    bool isPureSampler() const { return false; }
-    bool isTexture()     const { return false; }
     bool isImage()       const { return false; }
     bool isImageClass()  const { return false; }
     bool isMultiSample() const { return false; }
@@ -114,19 +95,30 @@ struct TSampler {   // misnomer now; includes images, textures without sampler, 
     void setExternal(bool e) { }
     bool isYuv()         const { return false; }
 #else
-    bool    sampler : 1;  // true means a pure sampler, other fields should be clear()
-    bool   external : 1;  // GL_OES_EGL_image_external
-    bool        yuv : 1;  // GL_EXT_YUV_target
+    unsigned int vectorSize : 3;  // vector return type size.
     // Some languages support structures as sample results.  Storing the whole structure in the
     // TSampler is too large, so there is an index to a separate table.
+    static const unsigned structReturnIndexBits = 4;                        // number of index bits to use.
+    static const unsigned structReturnSlots = (1<<structReturnIndexBits)-1; // number of valid values
+    static const unsigned noReturnStruct = structReturnSlots;               // value if no return struct type.
+    // Index into a language specific table of texture return structures.
+    unsigned int structReturnIndex : structReturnIndexBits;
+
+    bool   external : 1;  // GL_OES_EGL_image_external
+    bool        yuv : 1;  // GL_EXT_YUV_target
+
+#ifdef ENABLE_HLSL
+    unsigned int getVectorSize() const { return vectorSize; }
+    void clearReturnStruct() { structReturnIndex = noReturnStruct; }
+    bool hasReturnStruct() const { return structReturnIndex != noReturnStruct; }
+    unsigned getStructReturnIndex() const { return structReturnIndex; }
+#endif
 
     bool is1D()          const { return dim == Esd1D; }
     bool isBuffer()      const { return dim == EsdBuffer; }
     bool isRect()        const { return dim == EsdRect; }
     bool isSubpass()     const { return dim == EsdSubpass; }
     bool isCombined()    const { return combined; }
-    bool isPureSampler() const { return sampler; }
-    bool isTexture()     const { return !sampler && !image; }
     bool isImage()       const { return image && !isSubpass(); }
     bool isImageClass()  const { return image; }
     bool isMultiSample() const { return ms; }
@@ -134,7 +126,12 @@ struct TSampler {   // misnomer now; includes images, textures without sampler, 
     void setExternal(bool e) { external = e; }
     bool isYuv()         const { return yuv; }
 #endif
+    bool isTexture()     const { return !sampler && !image; }
+    bool isPureSampler() const { return sampler; }
+
     void setCombined(bool c) { combined = c; }
+    void setBasicType(TBasicType t) { type = t; }
+    TBasicType getBasicType()  const { return type; }
     bool isShadow()      const { return shadow; }
     bool isArrayed()     const { return arrayed; }
 
@@ -147,8 +144,8 @@ struct TSampler {   // misnomer now; includes images, textures without sampler, 
         ms = false;
         image = false;
         combined = false;
-#ifndef GLSLANG_WEB
         sampler = false;
+#ifndef GLSLANG_WEB
         external = false;
         yuv = false;
 #endif
@@ -195,6 +192,14 @@ struct TSampler {   // misnomer now; includes images, textures without sampler, 
         ms = m;
     }
 
+    // make a pure sampler, no texture, no image, nothing combined, the 'sampler' keyword
+    void setPureSampler(bool s)
+    {
+        clear();
+        sampler = true;
+        shadow = s;
+    }
+
 #ifndef GLSLANG_WEB
     // make a subpass input attachment
     void setSubpass(TBasicType t, bool m = false)
@@ -204,14 +209,6 @@ struct TSampler {   // misnomer now; includes images, textures without sampler, 
         image = true;
         dim = EsdSubpass;
         ms = m;
-    }
-
-    // make a pure sampler, no texture, no image, nothing combined, the 'sampler' keyword
-    void setPureSampler(bool s)
-    {
-        clear();
-        sampler = true;
-        shadow = s;
     }
 #endif
 
@@ -226,9 +223,12 @@ struct TSampler {   // misnomer now; includes images, textures without sampler, 
             isCombined() == right.isCombined() &&
          isPureSampler() == right.isPureSampler() &&
             isExternal() == right.isExternal() &&
-                 isYuv() == right.isYuv() &&
-         getVectorSize() == right.getVectorSize() &&
-  getStructReturnIndex() == right.getStructReturnIndex();
+                 isYuv() == right.isYuv()
+#ifdef ENABLE_HLSL
+      && getVectorSize() == right.getVectorSize() &&
+  getStructReturnIndex() == right.getStructReturnIndex()
+#endif
+        ;
     }
 
     bool operator!=(const TSampler& right) const
@@ -406,6 +406,7 @@ enum TLayoutFormat {
     ElfRg8i,
     ElfR16i,
     ElfR8i,
+    ElfR64i,
 
     ElfIntGuard,       // to help with comparisons
 
@@ -423,6 +424,7 @@ enum TLayoutFormat {
     ElfRg8ui,
     ElfR16ui,
     ElfR8ui,
+    ElfR64ui,
 
     ElfCount
 };
@@ -473,6 +475,18 @@ enum TInterlockOrdering {
     EioCount,
 };
 
+enum TShaderInterface
+{
+    // Includes both uniform blocks and buffer blocks
+    EsiUniform = 0,
+    EsiInput,
+    EsiOutput,
+    EsiNone,
+
+    EsiCount
+};
+
+
 class TQualifier {
 public:
     static const int layoutNotSet = -1;
@@ -485,7 +499,9 @@ public:
         declaredBuiltIn = EbvNone;
 #ifndef GLSLANG_WEB
         noContraction = false;
+        nullInit = false;
 #endif
+        defaultBlock = false;
     }
 
     // drop qualifiers that don't belong in a temporary variable
@@ -498,6 +514,8 @@ public:
         clearMemory();
         specConstant = false;
         nonUniform = false;
+        nullInit = false;
+        defaultBlock = false;
         clearLayout();
     }
 
@@ -527,16 +545,19 @@ public:
 
     void clearMemory()
     {
+#ifndef GLSLANG_WEB
         coherent     = false;
         devicecoherent = false;
         queuefamilycoherent = false;
         workgroupcoherent = false;
         subgroupcoherent  = false;
+        shadercallcoherent = false;
         nonprivate = false;
         volatil      = false;
         restrict     = false;
         readonly     = false;
         writeonly    = false;
+#endif
     }
 
     const char*         semanticName;
@@ -549,23 +570,18 @@ public:
     bool centroid     : 1;
     bool smooth       : 1;
     bool flat         : 1;
-    bool coherent     : 1;
-    bool devicecoherent : 1;
-    bool queuefamilycoherent : 1;
-    bool workgroupcoherent : 1;
-    bool subgroupcoherent  : 1;
-    bool nonprivate   : 1;
-    bool volatil      : 1;
-    bool restrict     : 1;
-    bool readonly     : 1;
-    bool writeonly    : 1;
     // having a constant_id is not sufficient: expressions have no id, but are still specConstant
     bool specConstant : 1;
     bool nonUniform   : 1;
+    bool explicitOffset   : 1;
+    bool defaultBlock : 1; // default blocks with matching names have structures merged when linking
 
 #ifdef GLSLANG_WEB
     bool isWriteOnly() const { return false; }
     bool isReadOnly() const { return false; }
+    bool isRestrict() const { return false; }
+    bool isCoherent() const { return false; }
+    bool isVolatile() const { return false; }
     bool isSample() const { return false; }
     bool isMemory() const { return false; }
     bool isMemoryQualifierImageAndSSBOOnly() const { return false; }
@@ -577,6 +593,8 @@ public:
     bool isNoContraction() const { return false; }
     void setNoContraction() { }
     bool isPervertexNV() const { return false; }
+    void setNullInit() { }
+    bool isNullInit() const { return false; }
 #else
     bool noContraction: 1; // prevent contraction and reassociation, e.g., for 'precise' keyword, and expressions it affects
     bool nopersp      : 1;
@@ -587,16 +605,31 @@ public:
     bool perTaskNV : 1;
     bool patch        : 1;
     bool sample       : 1;
+    bool restrict     : 1;
+    bool readonly     : 1;
+    bool writeonly    : 1;
+    bool coherent     : 1;
+    bool volatil      : 1;
+    bool devicecoherent : 1;
+    bool queuefamilycoherent : 1;
+    bool workgroupcoherent : 1;
+    bool subgroupcoherent  : 1;
+    bool shadercallcoherent : 1;
+    bool nonprivate   : 1;
+    bool nullInit : 1;
     bool isWriteOnly() const { return writeonly; }
     bool isReadOnly() const { return readonly; }
+    bool isRestrict() const { return restrict; }
+    bool isCoherent() const { return coherent; }
+    bool isVolatile() const { return volatil; }
     bool isSample() const { return sample; }
     bool isMemory() const
     {
-        return subgroupcoherent || workgroupcoherent || queuefamilycoherent || devicecoherent || coherent || volatil || restrict || readonly || writeonly || nonprivate;
+        return shadercallcoherent || subgroupcoherent || workgroupcoherent || queuefamilycoherent || devicecoherent || coherent || volatil || restrict || readonly || writeonly || nonprivate;
     }
     bool isMemoryQualifierImageAndSSBOOnly() const
     {
-        return subgroupcoherent || workgroupcoherent || queuefamilycoherent || devicecoherent || coherent || volatil || restrict || readonly || writeonly;
+        return shadercallcoherent || subgroupcoherent || workgroupcoherent || queuefamilycoherent || devicecoherent || coherent || volatil || restrict || readonly || writeonly;
     }
     bool bufferReferenceNeedsVulkanMemoryModel() const
     {
@@ -619,6 +652,8 @@ public:
     bool isNoContraction() const { return noContraction; }
     void setNoContraction() { noContraction = true; }
     bool isPervertexNV() const { return pervertexNV; }
+    void setNullInit() { nullInit = true; }
+    bool isNullInit() const { return nullInit; }
 #endif
 
     bool isPipeInput() const
@@ -724,6 +759,46 @@ public:
         }
     }
 
+    TBlockStorageClass getBlockStorage() const {
+        if (storage == EvqUniform && !isPushConstant()) {
+            return EbsUniform;
+        }
+        else if (storage == EvqUniform) {
+            return EbsPushConstant;
+        }
+        else if (storage == EvqBuffer) {
+            return EbsStorageBuffer;
+        }
+        return EbsNone;
+    }
+
+    void setBlockStorage(TBlockStorageClass newBacking) {
+#ifndef GLSLANG_WEB
+        layoutPushConstant = (newBacking == EbsPushConstant);
+#endif
+        switch (newBacking) {
+        case EbsUniform :
+            if (layoutPacking == ElpStd430) {
+                // std430 would not be valid
+                layoutPacking = ElpStd140;
+            }
+            storage = EvqUniform;
+            break;
+        case EbsStorageBuffer : 
+            storage = EvqBuffer;
+            break;
+#ifndef GLSLANG_WEB
+        case EbsPushConstant :
+            storage = EvqUniform;
+            layoutSet = TQualifier::layoutSetEnd;
+            layoutBinding = TQualifier::layoutBindingEnd;
+            break;
+#endif
+        default:
+            break;
+        }
+    }
+
 #ifdef GLSLANG_WEB
     bool isPerView() const { return false; }
     bool isTaskMemory() const { return false; }
@@ -732,6 +807,12 @@ public:
     bool isPerPrimitive() const { return perPrimitiveNV; }
     bool isPerView() const { return perViewNV; }
     bool isTaskMemory() const { return perTaskNV; }
+    bool isAnyPayload() const {
+        return storage == EvqPayload || storage == EvqPayloadIn;
+    }
+    bool isAnyCallable() const {
+        return storage == EvqCallableData || storage == EvqCallableDataIn;
+    }
 
     // True if this type of IO is supposed to be arrayed with extra level for per-vertex data
     bool isArrayedIo(EShLanguage language) const
@@ -766,7 +847,7 @@ public:
         layoutViewportRelative = false;
         // -2048 as the default value indicating layoutSecondaryViewportRelative is not set
         layoutSecondaryViewportRelativeOffset = -2048;
-        layoutShaderRecordNV = false;
+        layoutShaderRecord = false;
         layoutBufferReferenceAlign = layoutBufferReferenceAlignEnd;
         layoutFormat = ElfNone;
 #endif
@@ -779,8 +860,8 @@ public:
     {
         layoutLocation = layoutLocationEnd;
         layoutComponent = layoutComponentEnd;
-        layoutIndex = layoutIndexEnd;
 #ifndef GLSLANG_WEB
+        layoutIndex = layoutIndexEnd;
         clearStreamLayout();
         clearXfbLayout();
 #endif
@@ -805,7 +886,7 @@ public:
                hasAnyLocation() ||
                hasStream() ||
                hasFormat() ||
-               isShaderRecordNV() ||
+               isShaderRecord() ||
                isPushConstant() ||
                hasBufferReference();
     }
@@ -814,6 +895,7 @@ public:
         return hasNonXfbLayout() ||
                hasXfb();
     }
+
     TLayoutMatrix  layoutMatrix  : 3;
     TLayoutPacking layoutPacking : 4;
     int layoutOffset;
@@ -864,7 +946,7 @@ public:
     bool layoutPassthrough;
     bool layoutViewportRelative;
     int layoutSecondaryViewportRelativeOffset;
-    bool layoutShaderRecordNV;
+    bool layoutShaderRecord;
 #endif
 
     bool hasUniformLayout() const
@@ -885,7 +967,9 @@ public:
 
         layoutSet = layoutSetEnd;
         layoutBinding = layoutBindingEnd;
+#ifndef GLSLANG_WEB
         layoutAttachment = layoutAttachmentEnd;
+#endif
     }
 
     bool hasMatrix() const
@@ -922,6 +1006,7 @@ public:
     bool hasOffset() const { return false; }
     bool isNonPerspective() const { return false; }
     bool hasIndex() const { return false; }
+    unsigned getIndex() const { return 0; }
     bool hasComponent() const { return false; }
     bool hasStream() const { return false; }
     bool hasFormat() const { return false; }
@@ -932,7 +1017,7 @@ public:
     bool hasAttachment() const { return false; }
     TLayoutFormat getFormat() const { return ElfNone; }
     bool isPushConstant() const { return false; }
-    bool isShaderRecordNV() const { return false; }
+    bool isShaderRecord() const { return false; }
     bool hasBufferReference() const { return false; }
     bool hasBufferReferenceAlign() const { return false; }
     bool isNonUniform() const { return false; }
@@ -946,6 +1031,7 @@ public:
     {
         return layoutIndex != layoutIndexEnd;
     }
+    unsigned getIndex() const { return layoutIndex; }
     bool hasComponent() const
     {
         return layoutComponent != layoutComponentEnd;
@@ -982,7 +1068,7 @@ public:
     }
     TLayoutFormat getFormat() const { return layoutFormat; }
     bool isPushConstant() const { return layoutPushConstant; }
-    bool isShaderRecordNV() const { return layoutShaderRecordNV; }
+    bool isShaderRecord() const { return layoutShaderRecord; }
     bool hasBufferReference() const { return layoutBufferReference; }
     bool hasBufferReferenceAlign() const
     {
@@ -1090,6 +1176,8 @@ public:
         case ElfR32ui:        return "r32ui";
         case ElfR16ui:        return "r16ui";
         case ElfR8ui:         return "r8ui";
+        case ElfR64ui:        return "r64ui";
+        case ElfR64i:         return "r64i";
         default:              return "none";
         }
     }
@@ -1195,6 +1283,7 @@ struct TShaderQualifiers {
     TVertexOrder order;
     bool pointMode;
     int localSize[3];         // compute shader
+    bool localSizeNotDefault[3];        // compute shader
     int localSizeSpecId[3];   // compute shader specialization id for gl_WorkGroupSize
 #ifndef GLSLANG_WEB
     bool earlyFragmentTests;  // fragment input
@@ -1207,6 +1296,7 @@ struct TShaderQualifiers {
     bool layoutDerivativeGroupQuads;    // true if layout derivative_group_quadsNV set
     bool layoutDerivativeGroupLinear;   // true if layout derivative_group_linearNV set
     int primitives;                     // mesh shader "max_primitives"DerivativeGroupLinear;   // true if layout derivative_group_linearNV set
+    bool layoutPrimitiveCulling;        // true if layout primitive_culling set
     TLayoutDepth getDepth() const { return layoutDepth; }
 #else
     TLayoutDepth getDepth() const { return EldNone; }
@@ -1225,6 +1315,9 @@ struct TShaderQualifiers {
         localSize[0] = 1;
         localSize[1] = 1;
         localSize[2] = 1;
+        localSizeNotDefault[0] = false;
+        localSizeNotDefault[1] = false;
+        localSizeNotDefault[2] = false;
         localSizeSpecId[0] = TQualifier::layoutNotSet;
         localSizeSpecId[1] = TQualifier::layoutNotSet;
         localSizeSpecId[2] = TQualifier::layoutNotSet;
@@ -1237,6 +1330,7 @@ struct TShaderQualifiers {
         layoutOverrideCoverage      = false;
         layoutDerivativeGroupQuads  = false;
         layoutDerivativeGroupLinear = false;
+        layoutPrimitiveCulling      = false;
         primitives                  = TQualifier::layoutNotSet;
         interlockOrdering = EioNone;
 #endif
@@ -1273,6 +1367,9 @@ struct TShaderQualifiers {
                 localSize[i] = src.localSize[i];
         }
         for (int i = 0; i < 3; ++i) {
+            localSizeNotDefault[i] = src.localSizeNotDefault[i] || localSizeNotDefault[i];
+        }
+        for (int i = 0; i < 3; ++i) {
             if (src.localSizeSpecId[i] != TQualifier::layoutNotSet)
                 localSizeSpecId[i] = src.localSizeSpecId[i];
         }
@@ -1297,6 +1394,8 @@ struct TShaderQualifiers {
             primitives = src.primitives;
         if (src.interlockOrdering != EioNone)
             interlockOrdering = src.interlockOrdering;
+        if (src.layoutPrimitiveCulling)
+            layoutPrimitiveCulling = src.layoutPrimitiveCulling;
 #endif
     }
 };
@@ -1594,6 +1693,23 @@ public:
         assert(fieldName);
         return *fieldName;
     }
+    TShaderInterface getShaderInterface() const
+    {
+        if (basicType != EbtBlock)
+            return EsiNone;
+
+        switch (qualifier.storage) {
+        default:
+            return EsiNone;
+        case EvqVaryingIn:
+            return EsiInput;
+        case EvqVaryingOut:
+            return EsiOutput;
+        case EvqUniform:
+        case EvqBuffer:
+            return EsiUniform;
+        }
+    }
 
     virtual TBasicType getBasicType() const { return basicType; }
     virtual const TSampler& getSampler() const { return sampler; }
@@ -1652,7 +1768,7 @@ public:
     }
     virtual bool isOpaque() const { return basicType == EbtSampler
 #ifndef GLSLANG_WEB
-         || basicType == EbtAtomicUint || basicType == EbtAccStructNV
+         || basicType == EbtAtomicUint || basicType == EbtAccStruct || basicType == EbtRayQuery
 #endif
         ; }
     virtual bool isBuiltIn() const { return getQualifier().builtIn != EbvNone; }
@@ -1913,6 +2029,7 @@ public:
         case EbtFloat:             return "float";
         case EbtInt:               return "int";
         case EbtUint:              return "uint";
+        case EbtSampler:           return "sampler/image";
 #ifndef GLSLANG_WEB
         case EbtVoid:              return "void";
         case EbtDouble:            return "double";
@@ -1925,11 +2042,12 @@ public:
         case EbtUint64:            return "uint64_t";
         case EbtBool:              return "bool";
         case EbtAtomicUint:        return "atomic_uint";
-        case EbtSampler:           return "sampler/image";
         case EbtStruct:            return "structure";
         case EbtBlock:             return "block";
-        case EbtAccStructNV:       return "accelerationStructureNV";
+        case EbtAccStruct:         return "accelerationStructureNV";
+        case EbtRayQuery:          return "rayQueryEXT";
         case EbtReference:         return "reference";
+        case EbtString:            return "string";
 #endif
         default:                   return "unknown type";
         }
@@ -2038,7 +2156,7 @@ public:
                     appendStr(" layoutSecondaryViewportRelativeOffset=");
                     appendInt(qualifier.layoutSecondaryViewportRelativeOffset);
                 }
-                if (qualifier.layoutShaderRecordNV)
+                if (qualifier.layoutShaderRecord)
                     appendStr(" shaderRecordNV");
 
                 appendStr(")");
@@ -2081,6 +2199,8 @@ public:
             appendStr(" workgroupcoherent");
         if (qualifier.subgroupcoherent)
             appendStr(" subgroupcoherent");
+        if (qualifier.shadercallcoherent)
+            appendStr(" shadercallcoherent");
         if (qualifier.nonprivate)
             appendStr(" nonprivate");
         if (qualifier.volatil)
@@ -2095,6 +2215,8 @@ public:
             appendStr(" specialization-constant");
         if (qualifier.nonUniform)
             appendStr(" nonuniform");
+        if (qualifier.isNullInit())
+            appendStr(" null-init");
         appendStr(" ");
         appendStr(getStorageQualifierString());
         if (isArray()) {
@@ -2186,7 +2308,8 @@ public:
     const TTypeList* getStruct() const { assert(isStruct()); return structure; }
     void setStruct(TTypeList* s) { assert(isStruct()); structure = s; }
     TTypeList* getWritableStruct() const { assert(isStruct()); return structure; }  // This should only be used when known to not be sharing with other threads
-
+    void setBasicType(const TBasicType& t) { basicType = t; }
+    
     int computeNumComponents() const
     {
         int components = 0;
@@ -2213,6 +2336,17 @@ public:
         name += ';' ;
     }
 
+    // These variables are inconsistently declared inside and outside of gl_PerVertex in glslang right now.
+    // They are declared inside of 'in gl_PerVertex', but sitting as standalone when they are 'out'puts.
+    bool isInconsistentGLPerVertexMember(const TString& name) const
+    {
+        if (name == "gl_SecondaryPositionNV" ||
+            name == "gl_PositionPerViewNV")
+            return true;
+        return false;
+    }
+
+
     // Do two structure types match?  They could be declared independently,
     // in different places, but still might satisfy the definition of matching.
     // From the spec:
@@ -2228,22 +2362,48 @@ public:
             (isStruct() && right.isStruct() && structure == right.structure))
             return true;
 
-        // Both being nullptr was caught above, now they both have to be structures of the same number of elements
-        if (!isStruct() || !right.isStruct() ||
-            structure->size() != right.structure->size())
-            return false;
-
         // Structure names have to match
         if (*typeName != *right.typeName)
             return false;
 
-        // Compare the names and types of all the members, which have to match
-        for (unsigned int i = 0; i < structure->size(); ++i) {
-            if ((*structure)[i].type->getFieldName() != (*right.structure)[i].type->getFieldName())
-                return false;
+        // There are inconsistencies with how gl_PerVertex is setup. For now ignore those as errors if they
+        // are known inconsistencies.
+        bool isGLPerVertex = *typeName == "gl_PerVertex";
 
-            if (*(*structure)[i].type != *(*right.structure)[i].type)
-                return false;
+        // Both being nullptr was caught above, now they both have to be structures of the same number of elements
+        if (!isStruct() || !right.isStruct() ||
+            (structure->size() != right.structure->size() && !isGLPerVertex))
+            return false;
+
+        // Compare the names and types of all the members, which have to match
+        for (size_t li = 0, ri = 0; li < structure->size() || ri < right.structure->size(); ++li, ++ri) {
+            if (li < structure->size() && ri < right.structure->size()) {
+                if ((*structure)[li].type->getFieldName() == (*right.structure)[ri].type->getFieldName()) {
+                    if (*(*structure)[li].type != *(*right.structure)[ri].type)
+                        return false;
+                } else {
+                    // If one of the members is something that's inconsistently declared, skip over it
+                    // for now.
+                    if (isGLPerVertex) {
+                        if (isInconsistentGLPerVertexMember((*structure)[li].type->getFieldName())) {
+                            ri--;
+                            continue;
+                        } else if (isInconsistentGLPerVertexMember((*right.structure)[ri].type->getFieldName())) {
+                            li--;
+                            continue;
+                        }
+                    } else {
+                        return false;
+                    }
+                }
+            // If we get here, then there should only be inconsistently declared members left
+            } else if (li < structure->size()) {
+                if (!isInconsistentGLPerVertexMember((*structure)[li].type->getFieldName()))
+                    return false;
+            } else {
+                if (!isInconsistentGLPerVertexMember((*right.structure)[ri].type->getFieldName()))
+                    return false;
+            }
         }
 
         return true;

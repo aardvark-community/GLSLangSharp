@@ -4,7 +4,8 @@
 #include <GlslangToSpv.h>
 #include <spirv-tools/optimizer.hpp>
 #include <sstream>
-#include<vector>
+#include <vector>
+#include <algorithm>
 #include <string.h>
 
 

@@ -170,6 +170,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;GLSLANGNATIVE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)..\libs\include\glslang\Include;$(SolutionDir)..\libs\include\glslang\Public;$(SolutionDir)..\libs\include\SPIRV;$(SolutionDir)..\libs\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -177,7 +178,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)..\libs\static\Release\windows\AMD64\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glslang.lib;HLSL.lib;OGLCompiler.lib;OSDependent.lib;SPIRV.lib;SPVRemapper.lib;SPIRV-Tools.lib;SPIRV-Tools-opt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glslang.lib;HLSL.lib;OGLCompiler.lib;OSDependent.lib;SPIRV.lib;SPVRemapper.lib;GenericCodeGen.lib;MachineIndependent.lib;SPIRV-Tools.lib;SPIRV-Tools-opt.lib;SPIRV-Tools-link.lib;SPIRV-Tools-reduce.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>
       <Command>xcopy /Y $(SolutionDir)..\libs\Native\GLSLangSharp\windows\AMD64\* $(SolutionDir)..\bin\Debug\ &amp;&amp; xcopy /Y $(SolutionDir)..\libs\Native\GLSLangSharp\windows\AMD64\* $(SolutionDir)..\bin\Release\</Command>

@@ -114,7 +114,8 @@ static TBuiltInResource defRes =
         /* .maxTaskWorkGroupSizeY_NV = */ 1,
         /* .maxTaskWorkGroupSizeZ_NV = */ 1,
         /* .maxMeshViewCountNV = */ 4,
-		/* limits */ defLimits
+		/* maxDualSourceDrawBuffersEXT */ 4,
+		defLimits
 	};
 
 

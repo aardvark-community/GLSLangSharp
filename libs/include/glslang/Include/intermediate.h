@@ -2,6 +2,7 @@
 // Copyright (C) 2002-2005  3Dlabs Inc. Ltd.
 // Copyright (C) 2012-2016 LunarG, Inc.
 // Copyright (C) 2017 ARM Limited.
+// Modifications Copyright (C) 2020 Advanced Micro Devices, Inc. All rights reserved.
 //
 // All rights reserved.
 //
@@ -274,6 +275,16 @@ enum TOperator {
     // uint64_t <-> pointer
     EOpConvUint64ToPtr,
     EOpConvPtrToUint64,
+
+    // uvec2 <-> pointer
+    EOpConvUvec2ToPtr,
+    EOpConvPtrToUvec2,
+
+    // uint64_t -> accelerationStructureEXT
+    EOpConvUint64ToAccStruct,
+
+    // uvec2 -> accelerationStructureEXT
+    EOpConvUvec2ToAccStruct,
 
     //
     // binary operations
@@ -582,6 +593,7 @@ enum TOperator {
     EOpTime,
 
     EOpAtomicAdd,
+    EOpAtomicSubtract,
     EOpAtomicMin,
     EOpAtomicMax,
     EOpAtomicAnd,
@@ -617,17 +629,22 @@ enum TOperator {
 
     EOpIsHelperInvocation,
 
+    EOpDebugPrintf,
+
     //
     // Branch
     //
 
-    EOpKill,            // Fragment only
+    EOpKill,                // Fragment only
+    EOpTerminateInvocation, // Fragment only
+    EOpDemote,              // Fragment only
+    EOpTerminateRayKHR,         // Any-hit only
+    EOpIgnoreIntersectionKHR,   // Any-hit only
     EOpReturn,
     EOpBreak,
     EOpContinue,
     EOpCase,
     EOpDefault,
-    EOpDemote,          // Fragment only
 
     //
     // Constructors
@@ -744,6 +761,7 @@ enum TOperator {
     EOpConstructNonuniform,     // expected to be transformed away, not present in final AST
     EOpConstructReference,
     EOpConstructCooperativeMatrix,
+    EOpConstructAccStruct,
     EOpConstructGuardEnd,
 
     //
@@ -895,12 +913,52 @@ enum TOperator {
     EOpFindLSB,
     EOpFindMSB,
 
+    EOpCountLeadingZeros,
+    EOpCountTrailingZeros,
+    EOpAbsDifference,
+    EOpAddSaturate,
+    EOpSubSaturate,
+    EOpAverage,
+    EOpAverageRounded,
+    EOpMul32x16,
+
     EOpTraceNV,
-    EOpReportIntersectionNV,
+    EOpTraceKHR,
+    EOpReportIntersection,
     EOpIgnoreIntersectionNV,
     EOpTerminateRayNV,
     EOpExecuteCallableNV,
+    EOpExecuteCallableKHR,
     EOpWritePackedPrimitiveIndices4x8NV,
+
+    //
+    // GL_EXT_ray_query operations
+    //
+
+    EOpRayQueryInitialize,
+    EOpRayQueryTerminate,
+    EOpRayQueryGenerateIntersection,
+    EOpRayQueryConfirmIntersection,
+    EOpRayQueryProceed,
+    EOpRayQueryGetIntersectionType,
+    EOpRayQueryGetRayTMin,
+    EOpRayQueryGetRayFlags,
+    EOpRayQueryGetIntersectionT,
+    EOpRayQueryGetIntersectionInstanceCustomIndex,
+    EOpRayQueryGetIntersectionInstanceId,
+    EOpRayQueryGetIntersectionInstanceShaderBindingTableRecordOffset,
+    EOpRayQueryGetIntersectionGeometryIndex,
+    EOpRayQueryGetIntersectionPrimitiveIndex,
+    EOpRayQueryGetIntersectionBarycentrics,
+    EOpRayQueryGetIntersectionFrontFace,
+    EOpRayQueryGetIntersectionCandidateAABBOpaque,
+    EOpRayQueryGetIntersectionObjectRayDirection,
+    EOpRayQueryGetIntersectionObjectRayOrigin,
+    EOpRayQueryGetWorldRayDirection,
+    EOpRayQueryGetWorldRayOrigin,
+    EOpRayQueryGetIntersectionObjectToWorld,
+    EOpRayQueryGetIntersectionWorldToObject,
+
     //
     // HLSL operations
     //
@@ -1078,6 +1136,8 @@ public:
     virtual TBasicType getBasicType() const { return type.getBasicType(); }
     virtual TQualifier& getQualifier() { return type.getQualifier(); }
     virtual const TQualifier& getQualifier() const { return type.getQualifier(); }
+    virtual TArraySizes* getArraySizes() { return type.getArraySizes(); }
+    virtual const TArraySizes* getArraySizes() const { return type.getArraySizes(); }
     virtual void propagatePrecision(TPrecisionQualifier);
     virtual int getVectorSize() const { return type.getVectorSize(); }
     virtual int getMatrixCols() const { return type.getMatrixCols(); }
@@ -1185,6 +1245,8 @@ public:
     virtual void traverse(TIntermTraverser*);
     TOperator getFlowOp() const { return flowOp; }
     TIntermTyped* getExpression() const { return expression; }
+    void setExpression(TIntermTyped* pExpression) { expression = pExpression; }
+    void updatePrecision(TPrecisionQualifier parentPrecision);
 protected:
     TOperator flowOp;
     TIntermTyped* expression;
@@ -1216,15 +1278,15 @@ public:
     // if symbol is initialized as symbol(sym), the memory comes from the pool allocator of sym. If sym comes from
     // per process threadPoolAllocator, then it causes increased memory usage per compile
     // it is essential to use "symbol = sym" to assign to symbol
-    TIntermSymbol(int i, const TString& n, const TType& t)
+    TIntermSymbol(long long i, const TString& n, const TType& t)
         : TIntermTyped(t), id(i),
-#ifdef ENABLE_HLSL
+#ifndef GLSLANG_WEB
         flattenSubset(-1),
 #endif
         constSubtree(nullptr)
           { name = n; }
-    virtual int getId() const { return id; }
-    virtual void changeId(int i) { id = i; }
+    virtual long long getId() const { return id; }
+    virtual void changeId(long long i) { id = i; }
     virtual const TString& getName() const { return name; }
     virtual void traverse(TIntermTraverser*);
     virtual       TIntermSymbol* getAsSymbolNode()       { return this; }
@@ -1233,18 +1295,20 @@ public:
     const TConstUnionArray& getConstArray() const { return constArray; }
     void setConstSubtree(TIntermTyped* subtree) { constSubtree = subtree; }
     TIntermTyped* getConstSubtree() const { return constSubtree; }
-#ifdef ENABLE_HLSL
+#ifndef GLSLANG_WEB
     void setFlattenSubset(int subset) { flattenSubset = subset; }
+    virtual const TString& getAccessName() const;
+
     int getFlattenSubset() const { return flattenSubset; } // -1 means full object
 #endif
 
     // This is meant for cases where a node has already been constructed, and
     // later on, it becomes necessary to switch to a different symbol.
-    virtual void switchId(int newId) { id = newId; }
+    virtual void switchId(long long newId) { id = newId; }
 
 protected:
-    int id;                      // the unique id of the symbol this node represents
-#ifdef ENABLE_HLSL
+    long long id;                // the unique id of the symbol this node represents
+#ifndef GLSLANG_WEB
     int flattenSubset;           // how deeply the flattened object rooted at id has been dereferenced
 #endif
     TString name;                // the name of the symbol this node represents
@@ -1305,11 +1369,13 @@ public:
     bool isSparseTexture()  const { return false; }
     bool isImageFootprint() const { return false; }
     bool isSparseImage()    const { return false; }
+    bool isSubgroup()       const { return false; }
 #else
     bool isImage()    const { return op > EOpImageGuardBegin    && op < EOpImageGuardEnd; }
     bool isSparseTexture() const { return op > EOpSparseTextureGuardBegin && op < EOpSparseTextureGuardEnd; }
     bool isImageFootprint() const { return op > EOpImageFootprintGuardBegin && op < EOpImageFootprintGuardEnd; }
     bool isSparseImage()   const { return op == EOpSparseImageLoad; }
+    bool isSubgroup() const { return op > EOpSubgroupGuardStart && op < EOpSubgroupGuardStop; }
 #endif
 
     void setOperationPrecision(TPrecisionQualifier p) { operationPrecision = p; }
