@@ -14,13 +14,22 @@ type ShaderStage =
     | Fragment = 4
     | Compute = 5
     | RayGen = 6
-    | RayIntersect = 7
-    | RayAnyHit = 8
-    | RayClosestHit = 9
-    | RayMiss = 10
+    | Intersect = 7
+    | AnyHit = 8
+    | ClosestHit = 9
+    | Miss = 10
     | Callable = 11
     | Task = 12
     | Mesh = 13
+
+[<RequireQualifiedAccess>]
+type Target =
+    | SPIRV_1_0 = 65536
+    | SPIRV_1_1 = 65792
+    | SPIRV_1_2 = 66048
+    | SPIRV_1_3 = 66304
+    | SPIRV_1_4 = 66560
+    | SPIRV_1_5 = 66816
 
 [<AutoOpen>]
 module private ``GLSLang internal functions`` =
@@ -373,11 +382,12 @@ module Optimization =
 
 
 module GLSLang =
-    
-    let tryCompile (stage : ShaderStage) (entryName : string) (defines : list<string>) (source : string) =
+
+    let tryCompileWithTarget (target : Target) (stage : ShaderStage) (entryName : string) (defines : list<string>) (source : string) =
         init()
 
         let lang = stage |> int |> unbox<Raw.ShLanguage>
+        let version = target |> int |> unbox<Raw.ShTargetLanguageVersion>
         let defines = List.toArray defines
 
         let mutable ptr = 0n
@@ -387,7 +397,7 @@ module GLSLang =
         let mutable log = 0n
 
         try
-            match Raw.GLSLang.ShCompileShader(lang, entryName, source, defines.Length, defines, &size, &ptr, &logLength, &log) with
+            match Raw.GLSLang.ShCompileShader(lang, version, entryName, source, defines.Length, defines, &size, &ptr, &logLength, &log) with
                 | 0 ->
                     let arr : byte[] = Array.zeroCreate (int size)
                     Marshal.Copy(ptr, arr, 0, int size)
@@ -399,6 +409,9 @@ module GLSLang =
         finally
             if ptr <> 0n then Raw.GLSLang.ShFree ptr
             if log <> 0n then Raw.GLSLang.ShFree log
+
+    let tryCompile (stage : ShaderStage) (entryName : string) (defines : list<string>) (source : string) =
+        tryCompileWithTarget Target.SPIRV_1_0 stage entryName defines source
             
     let optimize (passes : list<Optimization>) (binary : byte[]) =
         let passNames = passes |> Seq.map Optimization.toString |> Seq.toArray

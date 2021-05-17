@@ -156,10 +156,15 @@ DllExport(void) ShFinalizeProcess()
 	ShFinalize();
 }
 
-DllExport(int) ShCompileShader(EShLanguage lang, const char* entryName, const char* code, int nDefines, const char* defines[], size_t* outputSize, void** output, int* logLength, char** log)
+DllExport(int) ShCompileShader(EShLanguage language, glslang::EShTargetLanguageVersion version,
+							   const char* entryName, const char* code, int nDefines, const char* defines[],
+							   size_t* outputSize, void** output, int* logLength, char** log)
 {
-	glslang::TShader shader(lang);
+	glslang::TShader shader(language);
 	shader.setStrings(&code, 1);
+	//shader.setEnvClient(glslang::EShClientVulkan, (client == glslang::EShClientVulkan) ? glslang::EShTargetVulkan_1_0 : glslang::EShTargetOpenGL_450);
+	shader.setEnvTarget(glslang::EShTargetSpv, version);
+
 	std::string preamble;
 	if (nDefines > 0)
 	{
@@ -182,7 +187,7 @@ DllExport(int) ShCompileShader(EShLanguage lang, const char* entryName, const ch
 
 		if (program.link(EShMsgDefault))
 		{
-			auto intermediate = program.getIntermediate(lang);
+			auto intermediate = program.getIntermediate(language);
 			if (!intermediate) {
 				*output = nullptr;
 				*outputSize = 0;

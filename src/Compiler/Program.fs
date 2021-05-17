@@ -75,7 +75,7 @@ void main()
 
 let rclosest = """
 #version 460
-#extension GL_NV_ray_tracing : require
+#extension GL_EXT_ray_tracing : require
 #extension GL_EXT_nonuniform_qualifier : enable
 
 #ifdef RayClosestHit
@@ -87,11 +87,11 @@ struct RayPayload {
 	float reflector;
 };
 
-layout(location = 0) rayPayloadInNV RayPayload rayPayload;
+layout(location = 0) rayPayloadInEXT RayPayload rayPayload;
 
-hitAttributeNV vec3 attribs;
+hitAttributeEXT vec3 attribs;
 
-layout(binding = 0, set = 0) uniform accelerationStructureNV topLevelAS;
+layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
 layout(binding = 2, set = 0) uniform CameraProperties 
 {
 	mat4 viewInverse;
@@ -139,7 +139,7 @@ void main()
 	vec3 lightVector = normalize(cam.lightPos.xyz);
 	float dot_product = max(dot(lightVector, normal), 0.6);
 	rayPayload.color = v0.color * vec3(dot_product);
-	rayPayload.distance = gl_RayTmaxNV;
+	rayPayload.distance = gl_RayTmaxEXT;
 	rayPayload.normal = normal;
 
 	// Objects with full white vertex color are treated as reflectors
@@ -165,7 +165,7 @@ let main argv =
         sw.Stop()
         printfn "took: %.2fµs" (1000.0 * sw.Elapsed.TotalMilliseconds / float (iter))
 
-    match GLSLang.tryCompile ShaderStage.RayClosestHit "main" ["RayClosestHit"] rclosest with
+    match GLSLang.tryCompileWithTarget Target.SPIRV_1_4 ShaderStage.ClosestHit "main" ["RayClosestHit"] rclosest with
         | Some binary, log ->
             let code = System.Text.StringBuilder()
             let m = Module.ofArray binary
@@ -173,7 +173,7 @@ let main argv =
                 match Instruction.tryGetId i with
                     | Some id -> code.AppendLine(sprintf "%d:\t%A" id i) |> ignore
                     | None -> code.AppendLine(sprintf "   \t%A" i) |> ignore
-            File.WriteAllText(@"C:\Users\Schorsch\Desktop\org.spv", code.ToString())
+            //File.WriteAllText(@"C:\Users\Schorsch\Desktop\org.spv", code.ToString())
             
             let binary = GLSLang.optimizeDefault binary
             
@@ -183,7 +183,7 @@ let main argv =
                 match Instruction.tryGetId i with
                     | Some id -> code.AppendLine(sprintf "%d:\t%A" id i) |> ignore
                     | None -> code.AppendLine(sprintf "   \t%A" i) |> ignore
-            File.WriteAllText(@"C:\Users\Schorsch\Desktop\opt.spv", code.ToString())
+            //File.WriteAllText(@"C:\Users\Schorsch\Desktop\opt.spv", code.ToString())
 
         | None, e ->
             printfn "%s" e
