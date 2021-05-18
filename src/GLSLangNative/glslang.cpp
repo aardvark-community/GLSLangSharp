@@ -213,17 +213,18 @@ DllExport(int) ShCompileShader(EShLanguage language, glslang::EShTargetLanguageV
 			if(log)
 			{
 				std::string str;
-				str.append("#SHADER\r\n");
-				str.append(shader.getInfoLog());
-				str.append("#PROGRAM\r\n");
-				str.append(program.getInfoLog());
+
+				auto shaderLog = std::string(shader.getInfoLog());
+				auto programLog = std::string(program.getInfoLog());
+
+				if (!shaderLog.empty()) { str += "#SHADER\r\n" + shaderLog; }
+				if (!programLog.empty()) { str += "#PROGRAM\r\n" + programLog; }
 
 				auto len = str.length() + 1;
 				auto temp = new char[len];
 				strncpy(temp, str.c_str(), len);
 				*logLength = (int)(len - 1);
 				*log = temp;
-
 			}
 
 
