@@ -20,8 +20,8 @@ static TLimits defLimits =
 		/* generalConstantMatrixVectorIndexing */ true
 	};
 
-static TBuiltInResource defRes = 
-	{ 
+static TBuiltInResource defRes =
+	{
 		/* maxLights */ 32,
 		/* maxClipPlanes */ 6,
 		/* maxTextureUnits */ 32,
@@ -162,7 +162,6 @@ DllExport(int) ShCompileShader(EShLanguage language, glslang::EShTargetLanguageV
 {
 	glslang::TShader shader(language);
 	shader.setStrings(&code, 1);
-	//shader.setEnvClient(glslang::EShClientVulkan, (client == glslang::EShClientVulkan) ? glslang::EShTargetVulkan_1_0 : glslang::EShTargetOpenGL_450);
 	shader.setEnvTarget(glslang::EShTargetSpv, version);
 
 	std::string preamble;
@@ -178,7 +177,7 @@ DllExport(int) ShCompileShader(EShLanguage language, glslang::EShTargetLanguageV
 	}
 	shader.setEntryPoint(entryName);
 
-	
+
 	auto msg = (EShMessages) (EShMsgVulkanRules | EShMsgSpvRules);
 	if (shader.parse(&defRes, 140, ECompatibilityProfile, false, false, msg))
 	{
@@ -211,7 +210,7 @@ DllExport(int) ShCompileShader(EShLanguage language, glslang::EShTargetLanguageV
 			*output = (void*)result;
 			*outputSize = 4 * intSize;
 
-			if(log) 
+			if(log)
 			{
 				std::string str;
 				str.append("#SHADER\r\n");
