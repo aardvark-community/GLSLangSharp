@@ -248,7 +248,7 @@ DllExport(int) ShCompileShader(EShLanguage language, glslang::EShTargetLanguageV
 
 DllExport(void) ShFree(void* memory)
 {
-	delete memory;
+	delete[] (int*)memory;
 }
 
 std::string CanonicalizeFlag(const char* const* argv, int argc, int* argi) {
