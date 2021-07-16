@@ -26,4 +26,7 @@ x64
 /src/GLSLangNative/*.o
 /src/GLSLangNative/*.so
 .paket/Paket.Restore.targets
-/.paket
+/.paketsrc/GLSLangNative/include/
+src/GLSLangNative/lib/
+src/GLSLangNative/include
+.paket
