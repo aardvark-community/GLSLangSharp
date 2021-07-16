@@ -8,7 +8,7 @@ glslang.o: glslang.cpp glslang.h
 	g++ -I ./include -std=c++11 -fPIC -c glslang.cpp -o glslang.o
 
 libGLSLangNative.so: glslang.o
-	g++ glslang.o -shared -o libGLSLangNative.so -lglslang -lHLSL -lOGLCompiler -lOSDependent -lSPIRV -lSPVRemapper -lSPIRV-Tools-opt -lSPIRV-Tools -lMachineIndependent -L./lib
+	gcc glslang.o -shared -o libGLSLangNative.so -lglslang -lHLSL -Wl,--whole-archive -lOGLCompiler lib/libOSDependent.a -Wl,--no-whole-archive -lSPIRV -lMachineIndependent -lSPVRemapper -lSPIRV-Tools-opt -lSPIRV-Tools -L./lib 
 
 
 .PHONY clean:
