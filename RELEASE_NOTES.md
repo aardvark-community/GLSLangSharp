@@ -1,3 +1,6 @@
+### 0.4.10
+- fixed linux x64 builds
+
 ### 0.4.9
 - Returned log is actually empty if both shader and program logs were empty
 
