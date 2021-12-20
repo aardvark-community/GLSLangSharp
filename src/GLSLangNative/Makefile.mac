@@ -1,0 +1,24 @@
+
+all: deploy
+
+deploy: libGLSLangNative.so
+	cp libGLSLangNative.dylib ../../libs/Native/GLSLangSharp/mac/arm64/
+
+glslang.o: glslang.cpp glslang.h
+	g++ -I ../..libs/include -std=c++11 -fPIC -c glslang.cpp -o glslang.o
+
+libGLSLangNative.so: glslang.o
+	ld glslang.o -o libGLSLangNative.dylib \
+	-dylib -dynamic -S  \
+	-hidden-lGenericCodeGen -hidden-lSystem -hidden-lc++ \
+	-hidden-lglslang -hidden-lHLSL -hidden-lOGLCompiler -hidden-lOSDependent \
+	-hidden-lSPIRV -hidden-lMachineIndependent -hidden-lSPVRemapper -hidden-lSPIRV-Tools-opt \
+	-hidden-lSPIRV-Tools -L../../libs/static/Release/mac/arm64 \
+	-L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib
+	
+
+.PHONY clean:
+	rm -fr *.o libGLSLangNative.dylib
+	rm ../../libs/Native/GLSLangSharp/mac/arm64/libGLSLangNative.dylib
+	rm ../../bin/Debug/libGLSLangNative.dylib
+	rm ../../bin/Release/libGLSLangNative.dylib
