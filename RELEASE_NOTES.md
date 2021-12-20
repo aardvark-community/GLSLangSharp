@@ -1,3 +1,6 @@
+### 0.4.11
+- fixed linux x64 builds
+
 ### 0.4.10
 - fixed linux x64 builds
 
