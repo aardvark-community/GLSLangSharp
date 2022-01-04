@@ -1,7 +1,7 @@
 #pragma once
 
 #include <glslang/Public/ShaderLang.h>
-#include <glslang/SPIRV/GlslangToSpv.h>
+#include <SPIRV/GlslangToSpv.h>
 #include <spirv-tools/optimizer.hpp>
 #include <sstream>
 #include <vector>
