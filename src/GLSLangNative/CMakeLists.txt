@@ -22,7 +22,7 @@ CPMAddPackage(
     NAME spirv-tools
     GIT_TAG v2021.4
     GITHUB_REPOSITORY "KhronosGroup/SPIRV-Tools" 
-    OPTIONS "SKIP_SPIRV_TOOLS_INSTALL YES"
+    OPTIONS "SKIP_SPIRV_TOOLS_INSTALL YES" "SPIRV_SKIP_EXECUTABLES YES"
 )
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -34,7 +34,7 @@ add_library(GLSLangNative SHARED glslang.h glslang.cpp)
 include_directories(${glslang_SOURCE_DIR})
 include_directories(${spirv-headers_SOURCE_DIR})
 include_directories(${spirv-tools_SOURCE_DIR})
-target_link_libraries(GLSLangNative PRIVATE GenericCodeGen HLSL OGLCompiler OSDependent SPIRV MachineIndependent  SPVRemapper SPIRV-Tools-opt SPIRV-Tools )
+target_link_libraries(GLSLangNative PRIVATE GenericCodeGen HLSL OGLCompiler OSDependent SPIRV MachineIndependent SPIRV-Tools-opt SPIRV-Tools )
 
 
 SET(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/../../libs/Native/GLSLangSharp/") 
