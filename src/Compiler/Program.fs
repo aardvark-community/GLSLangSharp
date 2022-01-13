@@ -4,6 +4,7 @@
 open GLSLang
 open GLSLang.SpirV
 open System.IO
+open Aardvark.Base
 
 let code = """
 #version 450 core
@@ -153,6 +154,8 @@ void main()
 
 [<EntryPoint>]
 let main argv = 
+    Aardvark.Init()
+
     let perf() = 
         for i in 1 .. 10 do
             GLSLang.tryCompile ShaderStage.Vertex "main" ["Vertex"] code |> ignore
@@ -183,6 +186,9 @@ let main argv =
                 match Instruction.tryGetId i with
                     | Some id -> code.AppendLine(sprintf "%d:\t%A" id i) |> ignore
                     | None -> code.AppendLine(sprintf "   \t%A" i) |> ignore
+
+            printfn "%s" (code.ToString())
+
             //File.WriteAllText(@"C:\Users\Schorsch\Desktop\opt.spv", code.ToString())
 
         | None, e ->
