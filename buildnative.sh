@@ -12,7 +12,7 @@ then
     cmake --build bin/x86_64 --config Release
     cmake --install bin/x86_64 --config Release
 else
-    cmake -S src/Native -B bin/build
+    cmake -S src/GLSLangNative -B bin/build
     cmake --build bin/build --config Release
     cmake --install bin/build --config Release
 fi
