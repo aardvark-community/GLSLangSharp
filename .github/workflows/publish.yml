@@ -3,16 +3,28 @@ on: [push]
 
 jobs:
   mac:
-    name: OSX dependencies
+    name: OSX dependencies (x64)
     runs-on: macos-latest
     steps:  
       - uses: actions/checkout@v2
       - name: Build Native Libraries
-        run: ./buildnative.sh
+        run: ./buildnative.sh x86_64
       - name: Upload OSX native libs
         uses: actions/upload-artifact@v2
         with:
           name: osx
+          path: libs/Native/
+  macm1:
+    name: OSX dependencies (arm64)
+    runs-on: macos-latest
+    steps:  
+      - uses: actions/checkout@v2
+      - name: Build Native Libraries
+        run: ./buildnative.sh arm64
+      - name: Upload OSX native libs
+        uses: actions/upload-artifact@v2
+        with:
+          name: osxm1
           path: libs/Native/
   linux:
     name: Linux dependencies
@@ -44,13 +56,19 @@ jobs:
       - mac
       - windows
       - linux
+      - macm1
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Download OSX dependencies
+      - name: Download OSX dependencies (x64)
         uses: actions/download-artifact@v2
         with:
           name: osx
+          path: libs/Native/
+      - name: Download OSX dependencies (arm64)
+        uses: actions/download-artifact@v2
+        with:
+          name: osxm1
           path: libs/Native/
       - name: Download Linux dependencies
         uses: actions/download-artifact@v2
