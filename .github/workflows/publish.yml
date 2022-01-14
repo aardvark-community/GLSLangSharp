@@ -1,0 +1,85 @@
+name: Publish
+on: [push]
+
+jobs:
+  mac:
+    name: OSX dependencies
+    runs-on: macos-latest
+    steps:  
+      - uses: actions/checkout@v2
+      - name: Build Native Libraries
+        run: ./buildnative.sh
+      - name: Upload OSX native libs
+        uses: actions/upload-artifact@v2
+        with:
+          name: osx
+          path: libs/Native/
+  linux:
+    name: Linux dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Native Libraries
+        run: ./buildnative.sh
+      - name: Upload Linux native libs
+        uses: actions/upload-artifact@v2
+        with:
+          name: linux
+          path: libs/Native/
+  windows:
+    name: Windows dependencies
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Native Libraries
+        run: .\buildnative.cmd
+      - name: Upload Windows native libs
+        uses: actions/upload-artifact@v2
+        with:
+          name: windows
+          path: libs/Native/
+  final:
+    name: "Build Package"
+    needs: 
+      - mac
+      - windows
+      - linux
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download OSX dependencies
+        uses: actions/download-artifact@v2
+        with:
+          name: osx
+          path: libs/Native/
+      - name: Download Linux dependencies
+        uses: actions/download-artifact@v2
+        with:
+          name: linux
+          path: libs/Native/
+      - name: Download Windows dependencies
+        uses: actions/download-artifact@v2
+        with:
+          name: windows
+          path: libs/Native/
+      - name: Restore Tools
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0.100'
+        run: dotnet tool restore
+      - name: Restore
+        run: dotnet restore src\GLSLang.sln
+      - name: Build
+        run: dotnet build src\GLSLang.sln -c Release
+      - name: Pack
+        run: dotnet pack src\GLSLang.sln -c Release -o bin\pack
+      - name: Upload Package
+        uses: actions/upload-artifact@v2
+        with:
+          name: packages
+          path: bin\pack
+      # - name: NuGet
+      #   env:
+      #     NUGET_KEY: ${{ secrets.NUGET_KEY }}
+      #   shell: cmd
+      #   run: dotnet nuget push "bin\pack\*.nupkg" -k %NUGET_KEY% -s "https://api.nuget.org/v3/index.json" --skip-duplicate
