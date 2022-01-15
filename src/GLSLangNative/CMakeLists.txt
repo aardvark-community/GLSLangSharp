@@ -32,6 +32,12 @@ SET(CMAKE_BUILD_TYPE "MinSizeRel" CACHE INTERNAL "release mode")
 
 add_library(GLSLangNative SHARED glslang.h glslang.cpp)
 
+set_target_properties(GLSLangNative
+PROPERTIES
+    C_VISIBILITY_PRESET hidden
+    CXX_VISIBILITY_PRESET hidden
+)
+
 include_directories(${glslang_SOURCE_DIR})
 include_directories(${spirv-headers_SOURCE_DIR})
 include_directories(${spirv-tools_SOURCE_DIR})
