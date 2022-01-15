@@ -87,7 +87,7 @@ jobs:
       - name: Restore Tools
         run: dotnet tool restore
       - name: Restore
-        run: dotnet restore src\GLSLang.sln
+        run: dotnet paket restore
       - name: Build
         run: dotnet build src\GLSLang.sln -c Release
       - name: Pack
