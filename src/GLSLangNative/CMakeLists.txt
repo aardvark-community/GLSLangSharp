@@ -45,7 +45,7 @@ include_directories(${glslang_SOURCE_DIR})
 include_directories(${spirv-headers_SOURCE_DIR})
 include_directories(${spirv-tools_SOURCE_DIR})
 target_link_libraries(GLSLangNative PRIVATE GenericCodeGen HLSL OGLCompiler OSDependent SPIRV MachineIndependent SPIRV-Tools-opt SPIRV-Tools )
-
+add_link_options($<$<CONFIG:RELEASE>:-s>)
 
 SET(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/../../libs/Native/GLSLangSharp/") 
 install(TARGETS GLSLangNative DESTINATION ${OS}/${ARCH})
