@@ -39,6 +39,9 @@ set_target_properties(GLSLangNative
         CMAKE_C_VISIBILITY_PRESET hidden
         CMAKE_CXX_VISIBILITY_PRESET hidden
 )
+set_property(TARGET GLSLangNative 
+             PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)   
+
 
 include_directories(${glslang_SOURCE_DIR})
 include_directories(${spirv-headers_SOURCE_DIR})
