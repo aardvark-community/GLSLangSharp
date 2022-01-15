@@ -3,7 +3,7 @@ on: [push]
 
 jobs:
   mac:
-    name: OSX dependencies (x64)
+    name: OSX (x64)
     runs-on: macos-latest
     steps:  
       - uses: actions/checkout@v2
@@ -15,7 +15,7 @@ jobs:
           name: osx
           path: libs/Native/
   macm1:
-    name: OSX dependencies (arm64)
+    name: OSX (arm64)
     runs-on: macos-latest
     steps:  
       - uses: actions/checkout@v2
@@ -27,7 +27,7 @@ jobs:
           name: osxm1
           path: libs/Native/
   linux:
-    name: Linux dependencies
+    name: Linux (x64)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -39,7 +39,7 @@ jobs:
           name: linux
           path: libs/Native/
   windows:
-    name: Windows dependencies
+    name: Windows (x64)
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
@@ -51,7 +51,7 @@ jobs:
           name: windows
           path: libs/Native/
   final:
-    name: "Build Package"
+    name: "Pack"
     needs: 
       - mac
       - windows

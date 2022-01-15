@@ -3,9 +3,14 @@
 os=$(uname -s)
 if [ $os == "Darwin" ];
 then
-    cmake -DCMAKE_OSX_ARCHITECTURES=$1 -S src/GLSLangNative -B bin/$1
-    cmake --build bin/$1 --config Release
-    cmake --install bin/$1 --config Release
+    arch=$1;
+    if [ "$arch" == "" ];
+    then
+        arch=$(uname -m)
+    fi
+    cmake -DCMAKE_OSX_ARCHITECTURES=$arch -S src/GLSLangNative -B bin/$arch
+    cmake --build bin/$arch --config Release
+    cmake --install bin/$arch --config Release
 
 else
     cmake -S src/GLSLangNative -B bin/build
