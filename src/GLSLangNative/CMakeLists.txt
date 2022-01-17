@@ -4,6 +4,7 @@ include("cmake/Aardvark.cmake")
 
 project(GLSLangNative)
 include(CheckIPOSupported)
+cmake_policy(SET CMP0065 NEW)
 
 CPMAddPackage(
     NAME glslang
