@@ -9,6 +9,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: Build Native Libraries
         run: ./buildnative.sh x86_64
+      - name: Test
+        run: dotnet run --project src/Compiler/Compiler.fsproj
       - name: Upload OSX native libs
         uses: actions/upload-artifact@v2
         with:
@@ -33,6 +35,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: Build Native Libraries
         run: ./buildnative.sh
+      - name: Test
+        run: dotnet run --project src/Compiler/Compiler.fsproj
       - name: Upload Linux native libs
         uses: actions/upload-artifact@v2
         with:
@@ -45,6 +49,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: Build Native Libraries
         run: .\buildnative.cmd
+      - name: Test
+        run: dotnet run --project src\Compiler\Compiler.fsproj
       - name: Upload Windows native libs
         uses: actions/upload-artifact@v2
         with:
