@@ -11,7 +11,7 @@ if(UNIX)
     if(APPLE)
         set(CMAKE_SHARED_LINKER_FLAGS "-O1 -flto=thin -dead_strip")
     else()
-        set(CMAKE_SHARED_LINKER_FLAGS "-O1 -gc-sections")
+        set(CMAKE_SHARED_LINKER_FLAGS "-O1 --gc-sections")
     endif()
 endif()
 
