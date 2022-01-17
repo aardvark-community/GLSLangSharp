@@ -4,6 +4,17 @@ include("cmake/Aardvark.cmake")
 
 project(GLSLangNative)
 
+set(CMAKE_BUILD_TYPE, "Release")
+if(UNIX)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -ffunction-sections -fdata-sections -fvisibility=hidden")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -ffunction-sections -fdata-sections -fvisibility=hidden")
+    if(APPLE)
+        set(CMAKE_SHARED_LINKER_FLAGS "-O1 -flto=thin -dead_strip")
+    else()
+        set(CMAKE_SHARED_LINKER_FLAGS "-O1 -gc-sections")
+    endif()
+endif()
+
 CPMAddPackage(
     NAME glslang
     GIT_TAG 11.7.1
@@ -12,8 +23,6 @@ CPMAddPackage(
         "SKIP_GLSLANG_INSTALL YES" 
         "BUILD_SHARED_LIBS NO" 
         "ENABLE_GLSLANG_BINARIES NO" 
-        "CMAKE_C_FLAGS -ffunction-sections -fdata-sections" 
-        "CMAKE_CXX_FLAGS  -ffunction-sections -fdata-sections"
 )
 
 CPMAddPackage(
@@ -22,8 +31,6 @@ CPMAddPackage(
     GITHUB_REPOSITORY "KhronosGroup/SPIRV-Headers" 
     OPTIONS 
         "SPIRV_HEADERS_SKIP_INSTALL YES" 
-        "CMAKE_C_FLAGS -ffunction-sections -fdata-sections" 
-        "CMAKE_CXX_FLAGS -ffunction-sections -fdata-sections"
 )
 
 CPMAddPackage(
@@ -33,23 +40,12 @@ CPMAddPackage(
     OPTIONS 
         "SKIP_SPIRV_TOOLS_INSTALL YES" 
         "SPIRV_SKIP_EXECUTABLES ON"
-        "CMAKE_C_FLAGS -ffunction-sections -fdata-sections" 
-        "CMAKE_CXX_FLAGS -ffunction-sections -fdata-sections"
 )
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_C_VISIBILITY_PRESET hidden)
-set(CMAKE_CXX_VISIBILITY_PRESET hidden)
-message(STATUS "SHARED_LINKER_FLAGS:          ${CMAKE_SHARED_LINKER_FLAGS}")
 
 
-if(UNIX AND NOT APPLE)
-    set(CMAKE_SHARED_LINKER_FLAGS    "-Wl,-O1 -Wl,--as-needed -Wl,--gc-sections")
-elseif(APPLE)
-    set(CMAKE_MACOSX_RPATH ON)
-    set(CMAKE_SHARED_LINKER_FLAGS    "-Wl,-dead_strip")
-endif()
 
 add_library(GLSLangNative SHARED glslang.h glslang.cpp)
 
