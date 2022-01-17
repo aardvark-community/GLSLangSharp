@@ -42,7 +42,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if(APPLE)
     set(CMAKE_SHARED_LINKER_FLAGS "-O3 -flto=thin -dead_strip")
 else()
-    set(CMAKE_SHARED_LINKER_FLAGS "-O3 -Wl,--gc-sections")
+    set(CMAKE_SHARED_LINKER_FLAGS "-O3 -Wl,--gc-sections -Wl,--strip-all")
 endif()
 
 
