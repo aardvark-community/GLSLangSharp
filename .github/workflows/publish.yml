@@ -13,6 +13,10 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '6.0.100'
+      - name: Restore Tools
+        run: dotnet tool restore
+      - name: Restore
+        run: dotnet paket restore
       - name: Test
         run: dotnet run --project src/Compiler/Compiler.fsproj
       - name: Upload OSX native libs
@@ -43,6 +47,10 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '6.0.100'
+      - name: Restore Tools
+        run: dotnet tool restore
+      - name: Restore
+        run: dotnet paket restore
       - name: Test
         run: dotnet run --project src/Compiler/Compiler.fsproj
       - name: Upload Linux native libs
@@ -61,6 +69,10 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '6.0.100'
+      - name: Restore Tools
+        run: dotnet tool restore
+      - name: Restore
+        run: dotnet paket restore
       - name: Test
         run: dotnet run --project src\Compiler\Compiler.fsproj
       - name: Upload Windows native libs
