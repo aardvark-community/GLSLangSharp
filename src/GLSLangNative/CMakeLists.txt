@@ -8,21 +8,33 @@ CPMAddPackage(
     NAME glslang
     GIT_TAG 11.7.1
     GITHUB_REPOSITORY "KhronosGroup/glslang" 
-    OPTIONS "SKIP_GLSLANG_INSTALL YES"
+    OPTIONS 
+        "SKIP_GLSLANG_INSTALL YES" 
+        "BUILD_SHARED_LIBS NO" 
+        "ENABLE_GLSLANG_BINARIES NO" 
+        "CMAKE_C_FLAGS -ffunction-sections -fdata-sections" 
+        "CMAKE_CXX_FLAGS  -ffunction-sections -fdata-sections"
 )
 
 CPMAddPackage(
     NAME spirv-headers
     GIT_TAG sdk-1.2.198.0
     GITHUB_REPOSITORY "KhronosGroup/SPIRV-Headers" 
-    OPTIONS "SPIRV_HEADERS_SKIP_INSTALL YES" 
+    OPTIONS 
+        "SPIRV_HEADERS_SKIP_INSTALL YES" 
+        "CMAKE_C_FLAGS -ffunction-sections -fdata-sections" 
+        "CMAKE_CXX_FLAGS -ffunction-sections -fdata-sections"
 )
 
 CPMAddPackage(
     NAME spirv-tools
     GIT_TAG v2021.4
     GITHUB_REPOSITORY "KhronosGroup/SPIRV-Tools" 
-    OPTIONS "SKIP_SPIRV_TOOLS_INSTALL YES" "SPIRV_SKIP_EXECUTABLES YES"
+    OPTIONS 
+        "SKIP_SPIRV_TOOLS_INSTALL YES" 
+        "SPIRV_SKIP_EXECUTABLES ON"
+        "CMAKE_C_FLAGS -ffunction-sections -fdata-sections" 
+        "CMAKE_CXX_FLAGS -ffunction-sections -fdata-sections"
 )
 
 set(CMAKE_CXX_STANDARD 11)

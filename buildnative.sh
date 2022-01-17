@@ -9,11 +9,11 @@ then
         arch=$(uname -m)
     fi
     cmake -DCMAKE_OSX_ARCHITECTURES=$arch -S src/GLSLangNative -B bin/$arch
-    cmake --build bin/$arch --config MinSizeRel --target install/strip
+    cmake --build bin/$arch --config MinSizeRel
     cmake --install bin/$arch --config MinSizeRel
 
 else
     cmake -S src/GLSLangNative -B bin/build
-    cmake --build bin/build --config Release --target install/strip
+    cmake --build bin/build --config Release
     cmake --install bin/build --config Release
 fi
