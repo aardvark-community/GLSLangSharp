@@ -42,6 +42,15 @@ if(result)
     set_target_properties(GLSLangNative PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif()
 
+if(UNIX AND NOT APPLE)
+    set(CMAKE_SHARED_LINKER_FLAGS    "-Wl,-O1 -Wl,--as-needed -Wl,--gc-sections")
+elseif(APPLE)
+    set(CMAKE_ACOSX_RPATH ON)
+    set(CMAKE_SHARED_LINKER_FLAGS    "-Wl,-dead_strip")
+endif()
+
+message(STATUS "SHARED_LINKER_FLAGS:          ${CMAKE_SHARED_LINKER_FLAGS}")
+
 include_directories(${glslang_SOURCE_DIR})
 include_directories(${spirv-headers_SOURCE_DIR})
 include_directories(${spirv-tools_SOURCE_DIR})
