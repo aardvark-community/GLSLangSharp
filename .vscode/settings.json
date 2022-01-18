@@ -12,5 +12,6 @@
         "**/obj": true,
         ".paket": true,
         "src/**/Aardvark.log": true,
-    }
+    },
+    "cmake.configureOnOpen": false
 }

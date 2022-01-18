@@ -1,6 +1,5 @@
 name: Publish
-on: [push]
-
+on: [push, pull_request]
 jobs:
   mac:
     name: OSX (x64)
@@ -127,8 +126,8 @@ jobs:
         with:
           name: packages
           path: bin\pack
-      # - name: NuGet
-      #   env:
-      #     NUGET_KEY: ${{ secrets.NUGET_KEY }}
-      #   shell: cmd
-      #   run: dotnet nuget push "bin\pack\*.nupkg" -k %NUGET_KEY% -s "https://api.nuget.org/v3/index.json" --skip-duplicate
+      - name: NuGet
+        env:
+          NUGET_KEY: ${{ secrets.NUGET_KEY }}
+        shell: cmd
+        run: dotnet nuget push "bin\pack\*.nupkg" -k %NUGET_KEY% -s "https://api.nuget.org/v3/index.json" --skip-duplicate
