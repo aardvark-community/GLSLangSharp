@@ -1,0 +1,133 @@
+name: Publish
+on: [push, pull_request]
+jobs:
+  mac:
+    name: OSX (x64)
+    runs-on: macos-latest
+    steps:  
+      - uses: actions/checkout@v2
+      - name: Build Native Libraries
+        run: ./buildnative.sh x86_64
+      - name: Install Dotnet
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0.100'
+      - name: Restore Tools
+        run: dotnet tool restore
+      - name: Restore
+        run: dotnet paket restore
+      - name: Test
+        run: dotnet run --project src/Compiler/Compiler.fsproj
+      - name: Upload OSX native libs
+        uses: actions/upload-artifact@v2
+        with:
+          name: osx
+          path: libs/Native/
+  macm1:
+    name: OSX (arm64)
+    runs-on: macos-latest
+    steps:  
+      - uses: actions/checkout@v2
+      - name: Build Native Libraries
+        run: ./buildnative.sh arm64
+      - name: Upload OSX native libs
+        uses: actions/upload-artifact@v2
+        with:
+          name: osxm1
+          path: libs/Native/
+  linux:
+    name: Linux (x64)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Native Libraries
+        run: ./buildnative.sh
+      - name: Install Dotnet
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0.100'
+      - name: Restore Tools
+        run: dotnet tool restore
+      - name: Restore
+        run: dotnet paket restore
+      - name: Test
+        run: dotnet run --project src/Compiler/Compiler.fsproj
+      - name: Upload Linux native libs
+        uses: actions/upload-artifact@v2
+        with:
+          name: linux
+          path: libs/Native/
+  windows:
+    name: Windows (x64)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Native Libraries
+        run: .\buildnative.cmd
+      - name: Install Dotnet
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0.100'
+      - name: Restore Tools
+        run: dotnet tool restore
+      - name: Restore
+        run: dotnet paket restore
+      - name: Test
+        run: dotnet run --project src\Compiler\Compiler.fsproj
+      - name: Upload Windows native libs
+        uses: actions/upload-artifact@v2
+        with:
+          name: windows
+          path: libs/Native/
+  final:
+    name: "Pack"
+    needs: 
+      - mac
+      - windows
+      - linux
+      - macm1
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download OSX dependencies (x64)
+        uses: actions/download-artifact@v2
+        with:
+          name: osx
+          path: libs/Native/
+      - name: Download OSX dependencies (arm64)
+        uses: actions/download-artifact@v2
+        with:
+          name: osxm1
+          path: libs/Native/
+      - name: Download Linux dependencies
+        uses: actions/download-artifact@v2
+        with:
+          name: linux
+          path: libs/Native/
+      - name: Download Windows dependencies
+        uses: actions/download-artifact@v2
+        with:
+          name: windows
+          path: libs/Native/
+      - name: Install Dotnet
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0.100'
+      - name: Restore Tools
+        run: dotnet tool restore
+      - name: Restore
+        run: dotnet paket restore
+      - name: Build
+        run: dotnet build src\GLSLang.sln -c Release
+      - name: Pack
+        run: dotnet pack src\GLSLang.sln -c Release -o bin\pack
+      - name: Upload Package
+        uses: actions/upload-artifact@v2
+        with:
+          name: packages
+          path: bin\pack
+      - name: NuGet
+        env:
+          NUGET_KEY: ${{ secrets.NUGET_KEY }}
+        shell: cmd
+        run: dotnet nuget push "bin\pack\*.nupkg" -k %NUGET_KEY% -s "https://api.nuget.org/v3/index.json" --skip-duplicate

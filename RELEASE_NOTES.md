@@ -1,3 +1,6 @@
+### 0.4.12
+- automated builds for all platforms
+
 ### 0.4.11
 - fixed linux x64 builds
 

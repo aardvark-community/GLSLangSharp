@@ -34,5 +34,7 @@ src/GLSLangNative/include
 .paket
 .DS_Store
 src/GLSLangNative/libGLSLangNative.dylib
-/.vscode
+/.vscode/*.log
 Aardvark.log
+/*/**/.vscode
+/libs

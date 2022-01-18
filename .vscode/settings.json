@@ -1,0 +1,17 @@
+{
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true,
+        ".ionide": true,
+        "packages": true,
+        "paket-files": true,
+        "**/obj": true,
+        ".paket": true,
+        "src/**/Aardvark.log": true,
+    },
+    "cmake.configureOnOpen": false
+}

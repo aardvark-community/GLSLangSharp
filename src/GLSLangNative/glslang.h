@@ -12,7 +12,7 @@
 #if _WIN32
 #define DllExport(t) extern "C" __declspec(dllexport) t
 #else
-#define DllExport(t) extern "C" t
+#define DllExport(t) extern "C" __attribute__((visibility("default"))) t
 #endif
 
 

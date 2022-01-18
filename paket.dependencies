@@ -3,11 +3,5 @@ source https://api.nuget.org/v3/index.json
 storage: none
 
 nuget FSharp.Core >= 5.0.0 lowest_matching: true
-nuget Aardvark.Build ~> 1.0.0-prerelease0006
+nuget Aardvark.Build ~> 1.0.0-prerelease0010
 nuget Aardvark.Base ~> 5.1.25
-
-group Build
-source https://api.nuget.org/v3/index.json
-github aardvark-platform/aardvark.fake:v511
-
-nuget FSharp.Core >= 5.0.0 lowest_matching: true
