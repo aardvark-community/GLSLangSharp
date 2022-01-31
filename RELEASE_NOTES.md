@@ -1,3 +1,6 @@
+### 0.4.13
+- older build environments for more compatibility (e.g. ubuntu 18)
+
 ### 0.4.12
 - automated builds for all platforms
 
