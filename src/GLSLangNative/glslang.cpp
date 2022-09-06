@@ -39,7 +39,7 @@ static TBuiltInResource defRes =
 		/* maxFragmentUniformVectors */ 16,
 		/* maxVertexOutputVectors */ 16,
 		/* maxFragmentInputVectors */ 15,
-		/* minProgramTexelOffset */ 8,
+		/* minProgramTexelOffset */ -8,
 		/* maxProgramTexelOffset */ 7,
 		/* maxClipDistances */ 8,
 		/* maxComputeWorkGroupCountX */ 65535,
