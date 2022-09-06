@@ -1,3 +1,6 @@
+### 0.4.15
+- Fixed minProgramTexelOffset
+
 ### 0.4.14
 - older build environments for more compatibility (e.g. ubuntu 18), now with nuget push
 
