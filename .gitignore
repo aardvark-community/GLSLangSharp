@@ -38,3 +38,5 @@ src/GLSLangNative/libGLSLangNative.dylib
 Aardvark.log
 /*/**/.vscode
 /libs
+**/.vs
+out
