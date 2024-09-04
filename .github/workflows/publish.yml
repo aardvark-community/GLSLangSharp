@@ -93,22 +93,22 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Download OSX dependencies (x64)
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4.1.7
         with:
           name: osx
           path: libs/Native/
       - name: Download OSX dependencies (arm64)
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4.1.7
         with:
           name: osxm1
           path: libs/Native/
       - name: Download Linux dependencies
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4.1.7
         with:
           name: linux
           path: libs/Native/
       - name: Download Windows dependencies
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4.1.7
         with:
           name: windows
           path: libs/Native/
