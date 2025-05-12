@@ -4,13 +4,29 @@ on:
     branches:
       - master
 jobs:
-  mac:
-    name: OSX (x64)
-    runs-on: macos-12
-    steps:  
+  build:
+    name: "Build"
+    runs-on: ${{ matrix.os }}
+    strategy:
+        matrix:
+            os: [ubuntu-22.04, windows-2019, macos-13, macos-14]
+            include:
+              - os: ubuntu-22.04
+                build: ./buildnative.sh
+                name: linux
+              - os: windows-2019
+                build: .\buildnative.cmd
+                name: windows
+              - os: macos-13
+                build: ./buildnative.sh x86_64
+                name: osxm1
+              - os: macos-14
+                build: ./buildnative.sh arm64
+                name: osx
+    steps:
       - uses: actions/checkout@v4
       - name: Build Native Libraries
-        run: ./buildnative.sh x86_64
+        run: ${{ matrix.build }}
       - name: Install Dotnet
         uses: actions/setup-dotnet@v4
         with:
@@ -21,74 +37,14 @@ jobs:
         run: dotnet paket restore
       - name: Test
         run: dotnet run --project src/Compiler/Compiler.fsproj
-      - name: Upload OSX native libs
+      - name: Upload native libs
         uses: actions/upload-artifact@v4
         with:
-          name: osx
+          name: ${{ matrix.name }}
           path: libs/Native/
-  macm1:
-    name: OSX (arm64)
-    runs-on: macos-12
-    steps:  
-      - uses: actions/checkout@v4
-      - name: Build Native Libraries
-        run: ./buildnative.sh arm64
-      - name: Upload OSX native libs
-        uses: actions/upload-artifact@v4
-        with:
-          name: osxm1
-          path: libs/Native/
-  linux:
-    name: Linux (x64)
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v4
-      - name: Build Native Libraries
-        run: ./buildnative.sh
-      - name: Install Dotnet
-        uses: actions/setup-dotnet@v4
-        with:
-          global-json-file: global.json
-      - name: Restore Tools
-        run: dotnet tool restore
-      - name: Restore
-        run: dotnet paket restore
-      - name: Test
-        run: dotnet run --project src/Compiler/Compiler.fsproj
-      - name: Upload Linux native libs
-        uses: actions/upload-artifact@v4
-        with:
-          name: linux
-          path: libs/Native/
-  windows:
-    name: Windows (x64)
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Build Native Libraries
-        run: .\buildnative.cmd
-      - name: Install Dotnet
-        uses: actions/setup-dotnet@v4
-        with:
-          global-json-file: global.json
-      - name: Restore Tools
-        run: dotnet tool restore
-      - name: Restore
-        run: dotnet paket restore
-      - name: Test
-        run: dotnet run --project src\Compiler\Compiler.fsproj
-      - name: Upload Windows native libs
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows
-          path: libs/Native/
-  final:
+  pack:
     name: "Pack"
-    needs: 
-      - mac
-      - windows
-      - linux
-      - macm1
+    needs: build
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -123,7 +79,7 @@ jobs:
       - name: Build
         run: dotnet build src\GLSLang.sln -c Release
       - name: Pack
-        run: dotnet pack src\GLSLang.sln -c Release -o bin\pack
+        run: dotnet aardpack src\GLSLang.sln -c Release --skip-build
       - name: Upload Package
         uses: actions/upload-artifact@v4
         with:
