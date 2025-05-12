@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.10)
 include("cmake/CPM.cmake")
 include("cmake/Aardvark.cmake")
 
@@ -12,7 +12,7 @@ endif()
 
 CPMAddPackage(
     NAME glslang
-    GIT_TAG vulkan-sdk-1.3.290.0
+    GIT_TAG vulkan-sdk-1.4.313.0
     GITHUB_REPOSITORY "KhronosGroup/glslang" 
     OPTIONS 
         "SKIP_GLSLANG_INSTALL YES" 
@@ -24,7 +24,7 @@ CPMAddPackage(
 
 CPMAddPackage(
     NAME spirv-headers
-    GIT_TAG vulkan-sdk-1.3.290.0
+    GIT_TAG vulkan-sdk-1.4.313.0
     GITHUB_REPOSITORY "KhronosGroup/SPIRV-Headers" 
     OPTIONS 
         "SPIRV_HEADERS_SKIP_INSTALL YES" 
@@ -32,11 +32,12 @@ CPMAddPackage(
 
 CPMAddPackage(
     NAME spirv-tools
-    GIT_TAG vulkan-sdk-1.3.290.0
+    GIT_TAG vulkan-sdk-1.4.313.0
     GITHUB_REPOSITORY "KhronosGroup/SPIRV-Tools" 
     OPTIONS 
         "SKIP_SPIRV_TOOLS_INSTALL YES" 
         "SPIRV_SKIP_EXECUTABLES ON"
+        "SPIRV_WERROR OFF"
 )
 
 set(CMAKE_CXX_STANDARD 11)
