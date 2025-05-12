@@ -59,7 +59,7 @@ module GLSLang =
             string code, 
             int nDefines, string[] defines, 
             unativeint& outputSize, nativeint& output, 
-            int& logLength, nativeint& log
+            int& logLength, nativeint& log, bool debug
         )
 
     [<DllImport(lib); SuppressUnmanagedCodeSecurity>]

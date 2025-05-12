@@ -158,17 +158,17 @@ let main argv =
 
     let perf() = 
         for i in 1 .. 10 do
-            GLSLang.tryCompile ShaderStage.Vertex "main" ["Vertex"] code |> ignore
+            GLSLang.tryCompile ShaderStage.Vertex "main" false ["Vertex"] code |> ignore
 
         let iter = 100
         let sw = System.Diagnostics.Stopwatch.StartNew()
         for i in 1 .. iter do
-            GLSLang.tryCompile ShaderStage.Vertex "main" ["Vertex"] code |> ignore
+            GLSLang.tryCompile ShaderStage.Vertex "main" true ["Vertex"] code |> ignore
 
         sw.Stop()
         printfn "took: %.2fµs" (1000.0 * sw.Elapsed.TotalMilliseconds / float (iter))
 
-    match GLSLang.tryCompileWithTarget Target.SPIRV_1_4 ShaderStage.ClosestHit "main" ["RayClosestHit"] rclosest with
+    match GLSLang.tryCompileWithTarget Target.SPIRV_1_4 ShaderStage.ClosestHit "main" false ["RayClosestHit"] rclosest with
         | Some binary, log ->
             let code = System.Text.StringBuilder()
             let m = Module.ofArray binary

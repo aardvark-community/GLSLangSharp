@@ -383,11 +383,11 @@ module Optimization =
 
 module GLSLang =
 
-    let tryCompileWithTarget (target : Target) (stage : ShaderStage) (entryName : string) (defines : list<string>) (source : string) =
+    let tryCompileWithTarget (target : Target) (stage : ShaderStage) (entryName : string) (debug : bool) (defines : list<string>) (source : string) =
         init()
 
-        let lang = stage |> int |> unbox<Raw.ShLanguage>
-        let version = target |> int |> unbox<Raw.ShTargetLanguageVersion>
+        let lang = stage |> int |> enum<Raw.ShLanguage>
+        let version = target |> int |> enum<Raw.ShTargetLanguageVersion>
         let defines = List.toArray defines
 
         let mutable ptr = 0n
@@ -397,7 +397,7 @@ module GLSLang =
         let mutable log = 0n
 
         try
-            match Raw.GLSLang.ShCompileShader(lang, version, entryName, source, defines.Length, defines, &size, &ptr, &logLength, &log) with
+            match Raw.GLSLang.ShCompileShader(lang, version, entryName, source, defines.Length, defines, &size, &ptr, &logLength, &log, debug) with
                 | 0 ->
                     let arr : byte[] = Array.zeroCreate (int size)
                     Marshal.Copy(ptr, arr, 0, int size)
@@ -410,9 +410,9 @@ module GLSLang =
             if ptr <> 0n then Raw.GLSLang.ShFree ptr
             if log <> 0n then Raw.GLSLang.ShFree log
 
-    let tryCompile (stage : ShaderStage) (entryName : string) (defines : list<string>) (source : string) =
-        tryCompileWithTarget Target.SPIRV_1_0 stage entryName defines source
-            
+    let tryCompile (stage : ShaderStage) (entryName : string) (debug : bool) (defines : list<string>) (source : string) =
+        tryCompileWithTarget Target.SPIRV_1_0 stage entryName debug defines source
+
     let optimize (passes : list<Optimization>) (binary : byte[]) =
         let passNames = passes |> Seq.map Optimization.toString |> Seq.toArray
 

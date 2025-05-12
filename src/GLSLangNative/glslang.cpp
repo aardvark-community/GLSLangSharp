@@ -163,9 +163,10 @@ DllExport(void) ShFinalizeProcess()
 
 DllExport(int) ShCompileShader(EShLanguage language, glslang::EShTargetLanguageVersion version,
 							   const char* entryName, const char* code, int nDefines, const char* defines[],
-							   size_t* outputSize, void** output, int* logLength, char** log)
+							   size_t* outputSize, void** output, int* logLength, char** log, bool debug)
 {
 	glslang::TShader shader(language);
+	shader.setDebugInfo(debug);
 	shader.setStrings(&code, 1);
 	shader.setEnvTarget(glslang::EShTargetSpv, version);
 
@@ -182,9 +183,10 @@ DllExport(int) ShCompileShader(EShLanguage language, glslang::EShTargetLanguageV
 	}
 	shader.setEntryPoint(entryName);
 
+	auto msg = EShMsgVulkanRules | EShMsgSpvRules;
+	if (debug) msg |= EShMsgDebugInfo;
 
-	auto msg = (EShMessages) (EShMsgVulkanRules | EShMsgSpvRules);
-	if (shader.parse(&defRes, 140, ECompatibilityProfile, false, false, msg))
+	if (shader.parse(&defRes, 140, ECompatibilityProfile, false, false, (EShMessages)msg))
 	{
 		glslang::TProgram program;
 		program.addShader(&shader);
@@ -198,8 +200,15 @@ DllExport(int) ShCompileShader(EShLanguage language, glslang::EShTargetLanguageV
 				return failProgram(program, logLength, log);
 			}
 
+			glslang::SpvOptions options;
+			if (debug) {
+				options.generateDebugInfo = true;
+				options.emitNonSemanticShaderDebugInfo = true;
+				options.emitNonSemanticShaderDebugSource = true;
+			}
+
 			std::vector<unsigned int> spirv;
-			glslang::GlslangToSpv(*intermediate, spirv);
+			glslang::GlslangToSpv(*intermediate, spirv, &options);
 
 			auto intSize = spirv.size();
 
