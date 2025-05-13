@@ -82,12 +82,19 @@ jobs:
       - name: Build
         run: dotnet build src\GLSLang.sln -c Release
       - name: Pack
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: dotnet aardpack src\GLSLang.sln -c Release --skip-build
       - name: Upload Package
         uses: actions/upload-artifact@v4
         with:
           name: packages
           path: bin\pack
+      - name: GitHub Packages
+        env:
+          NUGET_KEY: ${{ secrets.GITHUB_TOKEN }}
+        shell: cmd
+        run: dotnet nuget push "bin\pack\*.nupkg" -k %NUGET_KEY% -s "https://nuget.pkg.github.com/aardvark-community/index.json" --skip-duplicate
       - name: NuGet
         env:
           NUGET_KEY: ${{ secrets.NUGET_KEY }}
