@@ -1,3 +1,6 @@
+### 0.5.0
+- Added debug switch for inspecting shader source code with tools like NVIDIA Nsight
+
 ### 0.4.15
 - Fixed minProgramTexelOffset
 
