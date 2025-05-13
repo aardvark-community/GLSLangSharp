@@ -9,7 +9,7 @@ A simple wrapper around GLSLang/SpirV-Tools to compile GLSL to SpirV using [Aard
 ## Building
 ### Prerequesites
 * `cmake` and standard C/C++ build tools
-* `dotnet` >= 6.0
+* `dotnet` >= 8.0
 
 ### Compiling
 * `buildnative.(sh|cmd)` (this might take a while)
@@ -18,4 +18,4 @@ A simple wrapper around GLSLang/SpirV-Tools to compile GLSL to SpirV using [Aard
 
 ### Publish
 
-simply edit `RELEASE_NOTES.md` and push to master. The github actions will take care of building/publishing on nuget
+Simply edit `RELEASE_NOTES.md` and push to master. The github actions will take care of building/publishing on NuGet.
