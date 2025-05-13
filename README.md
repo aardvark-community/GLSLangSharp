@@ -7,7 +7,7 @@
 A simple wrapper around GLSLang/SpirV-Tools to compile GLSL to SpirV using [Aardvark](https://github.com/aardvark-platform)-style native depdencies.
 
 ## Building
-### Prerequesites
+### Prerequisites
 * `cmake` and standard C/C++ build tools
 * `dotnet` >= 8.0
 
