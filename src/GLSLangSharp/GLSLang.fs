@@ -282,6 +282,9 @@ type Optimization =
     | Workaround1209
     /// Remove the duplicated constants.
     | UnifyConst
+    
+    | SplitCombinedImageSampler
+    | Custom of flag : string
 
 module Optimization =
 
@@ -338,6 +341,8 @@ module Optimization =
             | Optimization.VectorDce                                   -> "--vector-dce"
             | Optimization.Workaround1209                              -> "--workaround-1209"
             | Optimization.UnifyConst                                  -> "--unify-const"
+            | Optimization.SplitCombinedImageSampler                   -> "--split-combined-image-sampler"
+            | Optimization.Custom flag                                 -> flag
             | Optimization.SetSpecConstDefaultValue map                -> 
                 let values = map |> Map.toList |> List.map (fun (id,value) -> sprintf "%d:%s" id value) |> String.concat " "
                 sprintf "--set-spec-const-default-value=%s" values

@@ -12,7 +12,7 @@ endif()
 
 CPMAddPackage(
     NAME glslang
-    GIT_TAG vulkan-sdk-1.4.313.0
+    GIT_TAG vulkan-sdk-1.4.321.0
     GITHUB_REPOSITORY "KhronosGroup/glslang" 
     OPTIONS 
         "SKIP_GLSLANG_INSTALL YES" 
@@ -24,7 +24,7 @@ CPMAddPackage(
 
 CPMAddPackage(
     NAME spirv-headers
-    GIT_TAG vulkan-sdk-1.4.313.0
+    GIT_TAG vulkan-sdk-1.4.321.0
     GITHUB_REPOSITORY "KhronosGroup/SPIRV-Headers" 
     OPTIONS 
         "SPIRV_HEADERS_SKIP_INSTALL YES" 
@@ -32,7 +32,7 @@ CPMAddPackage(
 
 CPMAddPackage(
     NAME spirv-tools
-    GIT_TAG vulkan-sdk-1.4.313.0
+    GIT_TAG vulkan-sdk-1.4.321.0
     GITHUB_REPOSITORY "KhronosGroup/SPIRV-Tools" 
     OPTIONS 
         "SKIP_SPIRV_TOOLS_INSTALL YES" 
