@@ -1,8 +1,8 @@
 # GLSLangSharp
 
 [![Publish](https://github.com/aardvark-community/GLSLangSharp/actions/workflows/publish.yml/badge.svg)](https://github.com/aardvark-community/GLSLangSharp/actions/workflows/publish.yml)
-[![Nuget](https://badgen.net/nuget/v/GLSLangSharp/pre)](https://www.nuget.org/packages/GLSLangSharp/)
-[![Downloads](https://badgen.net/nuget/dt/GLSLangSharp)](https://www.nuget.org/packages/GLSLangSharp/)
+[![Nuget](https://img.shields.io/nuget/vpre/GLSLangSharp)](https://www.nuget.org/packages/GLSLangSharp/)
+[![Downloads](https://img.shields.io/nuget/dt/GLSLangSharp)](https://www.nuget.org/packages/GLSLangSharp/)
 
 A simple wrapper around GLSLang/SpirV-Tools to compile GLSL to SpirV using [Aardvark](https://github.com/aardvark-platform)-style native depdencies.
 
