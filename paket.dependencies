@@ -4,4 +4,16 @@ storage: none
 
 nuget FSharp.Core           >= 8.0.0 lowest_matching: true
 nuget Aardvark.Build        ~> 2.0.4
-nuget Aardvark.Base         ~> 5.3.11
+
+group Test
+    framework: auto-detect
+    storage: none
+    source https://api.nuget.org/v3/index.json
+
+    nuget FSharp.Core              >= 8.0.0 lowest_matching: true
+    nuget Aardvark.Base            ~> 5.3.11
+
+    nuget Expecto                  ~> 10.2.0
+    nuget Expecto.FsCheck          ~> 10.2.0
+    nuget YoloDev.Expecto.TestSdk  ~> 0.15.6
+    nuget Microsoft.NET.Test.Sdk   ~> 18.7.0

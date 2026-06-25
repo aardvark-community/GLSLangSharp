@@ -19,6 +19,7 @@
     <Compile Include="SpirVInstructions.fs" />
     <Compile Include="SpirVReflection.fs" />
     <Compile Include="GLSLang.fs" />
+    <None Include="paket.references" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

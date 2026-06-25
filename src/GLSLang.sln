@@ -4,7 +4,7 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "GLSLangSharp", "GLSLangSharp\GLSLangSharp.fsproj", "{33E987BB-93AB-41AB-B44F-1B7BDEF61425}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Compiler", "Compiler\Compiler.fsproj", "{76FAC228-8566-4481-8213-3E51915DBDC9}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Tests", "Tests\Tests.fsproj", "{76FAC228-8566-4481-8213-3E51915DBDC9}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GLSLangNative", "GLSLangNative\GLSLangNative.vcxproj", "{7B1514AD-2B7E-4D93-9A84-1E2C7F09ECD7}"
 EndProject

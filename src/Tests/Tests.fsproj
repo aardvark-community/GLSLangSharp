@@ -4,8 +4,6 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
-    <IsPackable>false</IsPackable>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <OutputPath>..\..\bin\Debug\</OutputPath>
@@ -14,7 +12,9 @@
     <OutputPath>..\..\bin\Release\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Program.fs" />
+    <None Include="shaders/**/*" />
+    <Compile Include="Tests.fs" />
+    <None Include="paket.references" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GLSLangSharp\GLSLangSharp.fsproj" />
