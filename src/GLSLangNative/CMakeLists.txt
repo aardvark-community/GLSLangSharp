@@ -4,7 +4,7 @@ include("cmake/Aardvark.cmake")
 
 project(GLSLangNative)
 
-set(CMAKE_BUILD_TYPE, "Release")
+set(CMAKE_BUILD_TYPE "Release")
 if(UNIX)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -ffunction-sections -fdata-sections -fvisibility=hidden")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -ffunction-sections -fdata-sections -fvisibility=hidden")
@@ -12,7 +12,7 @@ endif()
 
 CPMAddPackage(
     NAME glslang
-    GIT_TAG vulkan-sdk-1.4.321.0
+    GIT_TAG vulkan-sdk-1.4.350.0
     GITHUB_REPOSITORY "KhronosGroup/glslang" 
     OPTIONS 
         "SKIP_GLSLANG_INSTALL YES" 
@@ -24,7 +24,7 @@ CPMAddPackage(
 
 CPMAddPackage(
     NAME spirv-headers
-    GIT_TAG vulkan-sdk-1.4.321.0
+    GIT_TAG vulkan-sdk-1.4.350.0
     GITHUB_REPOSITORY "KhronosGroup/SPIRV-Headers" 
     OPTIONS 
         "SPIRV_HEADERS_SKIP_INSTALL YES" 
@@ -32,7 +32,7 @@ CPMAddPackage(
 
 CPMAddPackage(
     NAME spirv-tools
-    GIT_TAG vulkan-sdk-1.4.321.0
+    GIT_TAG vulkan-sdk-1.4.350.0
     GITHUB_REPOSITORY "KhronosGroup/SPIRV-Tools" 
     OPTIONS 
         "SKIP_SPIRV_TOOLS_INSTALL YES" 
