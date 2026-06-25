@@ -45,6 +45,9 @@ jobs:
       - name: Restore
         run: dotnet paket restore
 
+      - name: Build
+        run: dotnet build -c Release src/GLSLang.sln
+
       - name: Test
         run: dotnet test src/GLSLang.sln -c Release --no-build --nologo --logger:"console;verbosity=normal"
 
