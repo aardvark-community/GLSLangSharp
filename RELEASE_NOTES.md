@@ -1,3 +1,7 @@
+### 0.5.2
+- Updated to vulkan-sdk-1.4.350.0
+- Changed native build type from Debug to Release
+
 ### 0.5.1
 - Added SplitCombinedImageSampler option
 
